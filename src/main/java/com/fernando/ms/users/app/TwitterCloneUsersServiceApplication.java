@@ -1,4 +1,4 @@
-package com.fernando.ms.users.app.twitter_clone_users_service;
+package com.fernando.ms.users.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

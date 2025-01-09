@@ -1,4 +1,4 @@
-package com.fernando.ms.users.app.twitter_clone_users_service;
+package com.fernando.ms.users.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
