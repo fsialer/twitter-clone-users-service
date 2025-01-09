@@ -2,11 +2,13 @@ spring:
   server: 8000
   application:
     name: twitter-clone-users-service
+  jackson:
+    default-property-inclusion: NON_NULL
   r2dbc:
     url: ${DB_HOST:r2dbc:postgresql://localhost:5432/tc_users_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:admin}
-  sql:
-    init:
-      mode: always
-      #schema-locations: classpath:schema.sql
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:schema.sql

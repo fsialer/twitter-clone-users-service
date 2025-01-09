@@ -6,9 +6,11 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRe
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,5 +22,9 @@ public class UserRestAdapter{
     @GetMapping
     public Flux<UserResponse> findAll(){
         return userRestMapper.toUsersResponse(userInputPort.findAll());
+    }
+    @GetMapping("/{id}")
+    public Mono<UserResponse> findById(@PathVariable Long id){
+        return userRestMapper.toUserResponse(userInputPort.finById(id));
     }
 }

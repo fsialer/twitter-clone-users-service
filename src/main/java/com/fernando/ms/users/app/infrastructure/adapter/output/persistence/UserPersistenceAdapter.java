@@ -7,6 +7,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.repos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +22,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userPersistenceMapper.toUsers(userReactiveRepository.findAll());
     }
 
+    @Override
+    public Mono<User> finById(Long id) {
+        return userReactiveRepository.findById(id).map(userPersistenceMapper::toUser);
+    }
 
 
 }

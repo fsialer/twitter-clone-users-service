@@ -14,9 +14,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -45,5 +47,21 @@ public class UserPersistenceAdapterTest {
                 .verifyComplete();
         Mockito.verify(userReactiveRepository,times(1)).findAll();
         Mockito.verify(userPersistenceMapper,times(1)).toUsers(any(Flux.class));
+    }
+
+    @Test
+    @DisplayName("When User Identifier Is Correct Expect User Information Correct")
+    void When_UserIdentifierIsCorrect_Expect_UserInformationCorrect(){
+        User user= TestUtilUser.buildUserMock();
+        UserEntity userEntity= TestUtilUser.buildUserEntityMock();
+        when(userReactiveRepository.findById(anyLong())).thenReturn(Mono.just(userEntity));
+        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(user);
+
+        Mono<User> result=userPersistenceAdapter.finById(1L);
+        StepVerifier.create(result)
+                .expectNext(user)
+                .verifyComplete();
+        Mockito.verify(userReactiveRepository,times(1)).findById(anyLong());
+        Mockito.verify(userPersistenceMapper,times(1)).toUser(any(UserEntity.class));
     }
 }

@@ -1,6 +1,7 @@
 package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
+import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +13,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +42,30 @@ public class UserServiceTest {
                 .expectNext(user)
                 .verifyComplete();
         Mockito.verify(userPersistencePort,times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("When User Identifier Is Correct Except User Information Correct")
+    void When_UserIdentifierIsCorrect_Except_UserInformationCorrect(){
+        User user= TestUtilUser.buildUserMock();
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        Mono<User> userMono=userService.finById(1L);
+        StepVerifier.create(userMono)
+                .expectNext(user)
+                .verifyComplete();
+        Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Expect UserNotFoundException When User Identifier Is Invalid")
+    void Expect_UserNotFoundException_When_UserIdentifierIsInvalid(){
+        User user= TestUtilUser.buildUserMock();
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.empty());
+        Mono<User> userMono=userService.finById(1L);
+        StepVerifier.create(userMono)
+                .expectError(UserNotFoundException.class)
+                .verify();
+        Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
     }
 
 }

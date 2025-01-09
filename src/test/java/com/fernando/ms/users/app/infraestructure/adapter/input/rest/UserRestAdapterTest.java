@@ -14,8 +14,10 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -31,8 +33,8 @@ public class UserRestAdapterTest {
     private UserRestMapper userRestMapper;
 
     @Test
-    @DisplayName("When_UsersAreExists_Expect_UsersInformationReturnSuccessfully")
-    void testCreateUser() {
+    @DisplayName("When Users Are Exists Expect Users Information Return Successfully")
+    void When_UsersAreExists_Expect_UsersInformationReturnSuccessfully() {
         UserResponse userResponse = TestUtilUser.buildUserResponseMock();
         User user=TestUtilUser.buildUserMock();
 
@@ -48,5 +50,23 @@ public class UserRestAdapterTest {
                 .jsonPath("$[0].email").isEqualTo("asialer05@hotmail.com");
         Mockito.verify(userInputPort,times(1)).findAll();
         Mockito.verify(userRestMapper,times(1)).toUsersResponse(any(Flux.class));
+    }
+
+    @Test
+    @DisplayName("When UserIdentifier Is Correct Expect User Information Successfully")
+    void When_UserIdentifierIsCorrect_Expect_UserInformationSuccessfully() {
+        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
+        User user = TestUtilUser.buildUserMock();
+     when(userInputPort.finById(anyLong())).thenReturn(Mono.just(user));
+     when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just(userResponse));
+     webTestClient.get()
+             .uri("/users/{id}",1L)
+             .exchange()
+             .expectStatus().isOk()
+             .expectBody()
+             .jsonPath("$.names").isEqualTo("Fernando Sialer")
+             .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+        Mockito.verify(userInputPort,times(1)).finById(anyLong());
+        Mockito.verify(userRestMapper,times(1)).toUserResponse(any(Mono.class));
     }
 }
