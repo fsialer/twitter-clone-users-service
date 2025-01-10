@@ -1,19 +1,31 @@
 package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
 import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
+import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
+import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.GlobalControllerAdvice;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.utils.ErrorCatalog;
+import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import reactor.core.publisher.Mono;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +35,12 @@ public class GlobalControllerAdviceTest {
 
     @MockBean
     private UserRestAdapter userRestAdapter;
+
+    @MockBean
+    private UserRestMapper userRestMapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private WebTestClient webTestClient;
 
@@ -63,6 +81,75 @@ public class GlobalControllerAdviceTest {
                 .value(response -> {
                     assert response.getCode().equals(ErrorCatalog.INTERNAL_SERVER_ERROR.getCode());
                     assert response.getMessage().equals(ErrorCatalog.INTERNAL_SERVER_ERROR.getMessage());
+                });
+    }
+
+
+    @Test
+    @DisplayName("Expect UserUsernameAlreadyExistsException When Username Already Exists")
+    void Expect_UserUsernameAlreadyExistsException_When_UsernameAlreadyExists() throws JsonProcessingException {
+        CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
+        User user=TestUtilUser.buildUserMock();
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
+        when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserUsernameAlreadyExistsException(createUserRequest.getUsername())));
+
+        webTestClient.post()
+                .uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(createUserRequest)) // Replace with actual request body
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(ErrorCatalog.USER_USERNAME_ALREADY_EXISTS.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_USERNAME_ALREADY_EXISTS.getMessage());
+                    assert response.getDetails().contains("User username: " + createUserRequest.getUsername() + " already exists!");
+                });
+    }
+
+    @Test
+    @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
+    void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() throws JsonProcessingException {
+        CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
+        User user=TestUtilUser.buildUserMock();
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
+        when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserEmailAlreadyExistsException(createUserRequest.getEmail())));
+
+        webTestClient.post()
+                .uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(createUserRequest)) // Replace with actual request body
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(ErrorCatalog.USER_EMAIL_USER__ALREADY_EXISTS.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_EMAIL_USER__ALREADY_EXISTS.getMessage());
+                    assert response.getDetails().contains("User email: "+createUserRequest.getEmail()+" already exists!");
+                });
+    }
+
+
+    @Test
+    @DisplayName("Expect WebExchangeBindException When User Information Is Invalid")
+    void Expect_WebExchangeBindException_When_UserInformationIsInvalid() throws JsonProcessingException {
+        CreateUserRequest createUserRequest= CreateUserRequest.builder()
+                .username("falex")
+                .names("Fernando Sialer")
+                .email("prueba")
+                .password("123456")
+                .build();
+
+        webTestClient.post()
+                .uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(createUserRequest))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(ErrorCatalog.USER_BAD_PARAMETERS.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_BAD_PARAMETERS.getMessage());
                 });
     }
 }

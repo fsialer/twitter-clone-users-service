@@ -1,10 +1,12 @@
 package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
+import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
 import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
+import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
 import com.fernando.ms.users.app.domain.models.User;
+import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
 import com.fernando.ms.users.app.utils.TestUtilUser;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +32,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private PasswordUtils passwordUtils;
 
     @Test
     @DisplayName("When Users Information Is Correct Expect A List Users")
@@ -66,6 +71,69 @@ public class UserServiceTest {
                 .expectError(UserNotFoundException.class)
                 .verify();
         Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
+    }
+
+
+    @Test
+    @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
+    void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() {
+        User user=TestUtilUser.buildUserMock();
+        when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
+        when(passwordUtils.generateSalt()).thenReturn("salt");
+        when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(user));
+
+        Mono<User> savedUser = userService.save(user);
+
+        StepVerifier.create(savedUser)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
+        Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
+        Mockito.verify(passwordUtils,times(1)).generateSalt();
+        Mockito.verify(passwordUtils,times(1)).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort,times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Expect UserUsernameAlreadyExistsException When Username Already Exists")
+    void Expect_UserUsernameAlreadyExistsException_When_UsernameAlreadyExists() {
+        User user=TestUtilUser.buildUserMock();
+        when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(true));
+
+        Mono<User> savedUser = userService.save(user);
+
+        StepVerifier.create(savedUser)
+                .expectError(UserUsernameAlreadyExistsException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).existsByEmail(anyString());
+        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
+        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Expect UserEmailAlreadyExistsException When Username Already Exists")
+    void Expect_UserEmailAlreadyExistsException_When_UsernameAlreadyExists() {
+        User user=TestUtilUser.buildUserMock();
+        when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
+
+        Mono<User> savedUser = userService.save(user);
+
+        StepVerifier.create(savedUser)
+                .expectError(UserEmailAlreadyExistsException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
+        Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
+        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
+        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
 }

@@ -27,5 +27,20 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.findById(id).map(userPersistenceMapper::toUser);
     }
 
+    @Override
+    public Mono<User> save(User user) {
+        return userPersistenceMapper.toUser(userReactiveRepository.save(userPersistenceMapper.toUserEntity(user)));
+    }
+
+    @Override
+    public Mono<Boolean> existsByEmail(String email) {
+        return userReactiveRepository.existsByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public Mono<Boolean> existsByUsername(String username) {
+        return userReactiveRepository.existsByUsernameIgnoreCase(username);
+    }
+
 
 }

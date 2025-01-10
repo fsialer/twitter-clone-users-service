@@ -1,6 +1,7 @@
 package com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper;
 
 import com.fernando.ms.users.app.domain.models.User;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 import org.mapstruct.Mapper;
@@ -21,4 +22,8 @@ public interface UserRestMapper {
     default  Mono<UserResponse> toUserResponse(Mono<User> user){
         return user.map(this::toUserResponse);
     }
+
+    User toUser(CreateUserRequest rq);
+
+    //UserResponse toUserResponse(User user);
 }

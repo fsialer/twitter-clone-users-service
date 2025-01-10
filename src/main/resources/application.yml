@@ -1,5 +1,5 @@
 spring:
-  server: 8000
+  port: 8080
   application:
     name: twitter-clone-users-service
   jackson:

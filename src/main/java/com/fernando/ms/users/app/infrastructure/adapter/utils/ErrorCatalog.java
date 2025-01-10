@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCatalog {
     USER_NOT_FOUND("USER_MS_001", "User not found."),
     USER_BAD_PARAMETERS("USER_MS_002", "Invalid parameters for creation user"),
+    USER_USERNAME_ALREADY_EXISTS("USER_MS_003", "Username already exists."),
+    USER_EMAIL_USER__ALREADY_EXISTS("USER_MS_004", "Email already exists."),
     INTERNAL_SERVER_ERROR("USER_MS_000", "Internal server error.");
 
 
