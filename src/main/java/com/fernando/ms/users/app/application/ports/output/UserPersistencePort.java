@@ -7,4 +7,7 @@ import reactor.core.publisher.Mono;
 public interface UserPersistencePort {
     Flux<User> findAll();
     Mono<User> finById(Long id);
+    Mono<User> save(User user);
+    Mono<Boolean> existsByEmail(String email);
+    Mono<Boolean> existsByUsername(String username);
 }

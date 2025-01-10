@@ -4,6 +4,7 @@ import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
@@ -68,5 +69,31 @@ public class UserRestAdapterTest {
              .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
         Mockito.verify(userInputPort,times(1)).finById(anyLong());
         Mockito.verify(userRestMapper,times(1)).toUserResponse(any(Mono.class));
+    }
+
+
+    @Test
+    @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
+    void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() {
+        CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
+        User user = TestUtilUser.buildUserMock();
+        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
+
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
+        when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just(userResponse));
+
+        webTestClient.post()
+                .uri("/users")
+                .bodyValue(createUserRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userInputPort, times(1)).save(any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(Mono.class));
     }
 }

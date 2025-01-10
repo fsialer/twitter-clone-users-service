@@ -18,8 +18,8 @@ public class UserEntity {
     private String username;
     private String names;
     private String email;
-    private String password;
     private String passwordHash;
+    private String passwordSalt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

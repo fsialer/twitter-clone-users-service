@@ -17,8 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -63,5 +62,54 @@ public class UserPersistenceAdapterTest {
                 .verifyComplete();
         Mockito.verify(userReactiveRepository,times(1)).findById(anyLong());
         Mockito.verify(userPersistenceMapper,times(1)).toUser(any(UserEntity.class));
+    }
+
+    @Test
+    @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
+    void When_User_Information_Is_Correct_Expect_User_Information_Saved_Successfully() {
+        User user= TestUtilUser.buildUserMock();
+        UserEntity userEntity= TestUtilUser.buildUserEntityMock();
+        when(userReactiveRepository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
+        when(userPersistenceMapper.toUserEntity(any(User.class))).thenReturn(userEntity);
+        when(userPersistenceMapper.toUser(any(Mono.class))).thenReturn(Mono.just(user));
+
+        Mono<User> savedUser = userPersistenceAdapter.save(user);
+
+        StepVerifier.create(savedUser)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository,times(1)).save(any(UserEntity.class));
+        Mockito.verify(userPersistenceMapper,times(1)).toUserEntity(any(User.class));
+        Mockito.verify(userPersistenceMapper,times(1)).toUser(any(Mono.class));
+    }
+
+    @Test
+    @DisplayName("When Email User Exists Expect Return True")
+    void When_EmailUserExists_Expect_Return_True() {
+
+        when(userReactiveRepository.existsByEmailIgnoreCase(anyString())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> exists = userPersistenceAdapter.existsByEmail("test@example.com");
+
+        StepVerifier.create(exists)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository,times(1)).existsByEmailIgnoreCase(anyString());
+    }
+
+    @Test
+    @DisplayName("When Username User Exists Expect Return True")
+    void When_UsernameUserExists_Expect_Return_True() {
+        when(userReactiveRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> exists = userPersistenceAdapter.existsByUsername("testuser");
+
+        StepVerifier.create(exists)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository,times(1)).existsByUsernameIgnoreCase(anyString());
     }
 }
