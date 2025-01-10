@@ -24,4 +24,6 @@ public interface UserRestMapper {
     }
 
     User toUser(CreateUserRequest rq);
+
+    //UserResponse toUserResponse(User user);
 }
