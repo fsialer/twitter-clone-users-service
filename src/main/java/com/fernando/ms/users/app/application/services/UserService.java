@@ -8,12 +8,16 @@ import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsExce
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.sql.SQLOutput;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserInputPort {
     private final UserPersistencePort userPersistencePort;
     private final PasswordUtils passwordUtils;
@@ -44,6 +48,26 @@ public class UserService implements UserInputPort {
                     user.setPasswordHash(passwordUtils.hashPassword(user.getPassword(),salt));
                     user.setPasswordSalt(salt);
                     return userPersistencePort.save(user);
+                });
+    }
+
+    @Override
+    public Mono<User> update(Long id, User user) {
+        return userPersistencePort.finById(id)
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(userInfo->{
+                    userInfo.setNames(user.getNames());
+                    if(!userInfo.getEmail().equals(user.getEmail())){
+                        return userPersistencePort.existsByEmail(user.getEmail())
+                                .flatMap(existsEmail->{
+                                    if(Boolean.TRUE.equals(existsEmail)){
+                                        return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
+                                    }
+                                    userInfo.setEmail(user.getEmail());
+                                   return userPersistencePort.save(userInfo);
+                                });
+                    }
+                    return userPersistencePort.save(userInfo);
                 });
     }
 }

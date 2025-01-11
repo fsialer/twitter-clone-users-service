@@ -8,6 +8,13 @@ spring:
     url: ${DB_HOST:r2dbc:postgresql://localhost:5432/tc_users_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:admin}
+logging:
+  level:
+    root: INFO
+    com.fernando.ms.users.app: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
 #  sql:
 #    init:
 #      mode: always

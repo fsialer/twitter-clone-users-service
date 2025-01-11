@@ -136,4 +136,47 @@ public class UserServiceTest {
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
+    @Test
+    @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
+    void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() {
+        User existingUser = TestUtilUser.buildUserMock();
+        User updatedUser = TestUtilUser.buildUserMock();
+        updatedUser.setEmail("newemail@example.com");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(existingUser));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
+
+        Mono<User> result = userService.update(1L, updatedUser);
+
+        StepVerifier.create(result)
+                .expectNext(updatedUser)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
+        Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
+    void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() {
+        User existingUser = TestUtilUser.buildUserMock();
+        User updatedUser = TestUtilUser.buildUserMock();
+        updatedUser.setEmail("newemail@example.com");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(existingUser));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
+
+        Mono<User> result = userService.update(1L, updatedUser);
+
+        StepVerifier.create(result)
+                .expectError(UserEmailAlreadyExistsException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
+    }
+
 }

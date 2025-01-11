@@ -5,6 +5,7 @@ import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.domain.exceptions.CustomValidationException;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,14 @@ public class UserRestAdapter{
                 .flatMap(user -> {
                     String location = "/users/".concat(user.getId().toString());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
+                });
+    }
+
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<UserResponse>> update(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest rq){
+        return userInputPort.update(id,userRestMapper.toUser(rq))
+                .flatMap(user->{
+                   return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
                 });
     }
 }

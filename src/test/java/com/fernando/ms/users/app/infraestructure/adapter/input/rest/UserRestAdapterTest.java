@@ -7,6 +7,7 @@ import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
@@ -103,4 +104,34 @@ public class UserRestAdapterTest {
         Mockito.verify(userInputPort, times(1)).save(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
+
+    @Test
+    @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
+    void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() throws JsonProcessingException {
+        UpdateUserRequest updateUserRequest = TestUtilUser.buildUpdateUserRequestMock();
+        User user = TestUtilUser.buildUserMock();
+        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
+
+        when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn(user);
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.put()
+                .uri("/users/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(updateUserRequest))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(UpdateUserRequest.class));
+        Mockito.verify(userInputPort, times(1)).save(any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
+    }
+
+
+
+
 }

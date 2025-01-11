@@ -8,5 +8,6 @@ public interface UserInputPort {
     Flux<User> findAll();
     Mono<User> finById(Long id);
     Mono<User> save(User user);
+    Mono<User> update(Long id,User user);
 }
    
