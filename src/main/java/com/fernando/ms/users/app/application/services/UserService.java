@@ -2,9 +2,7 @@ package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
-import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
-import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
-import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
+import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
@@ -76,5 +74,24 @@ public class UserService implements UserInputPort {
         return userPersistencePort.finById(id)
                 .switchIfEmpty(Mono.error(UserNotFoundException::new))
                 .flatMap(user->userPersistencePort.delete(id));
+    }
+
+    @Override
+    public Mono<User> changePassword(Long id, User user) {
+        return userPersistencePort.finById(id)
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(userInfo->{
+
+                    if(!passwordUtils.validatePassword(user.getPassword(),userInfo.getPasswordSalt(),userInfo.getPasswordHash())){
+                        return Mono.error(CredentialFailedException::new);
+                    }
+                    if(!user.getNewPassword().equals(user.getConfirmPassword())){
+                        return Mono.error(PasswordNotConfirmException::new);
+                    }
+                    String salt= passwordUtils.generateSalt();
+                    userInfo.setPasswordHash(passwordUtils.hashPassword(user.getNewPassword(),salt));
+                    userInfo.setPasswordSalt(salt);
+                    return userPersistencePort.save(userInfo);
+                });
     }
 }

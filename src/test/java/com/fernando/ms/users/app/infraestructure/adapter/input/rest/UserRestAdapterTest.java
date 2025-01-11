@@ -6,6 +6,7 @@ import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
@@ -142,6 +143,32 @@ public class UserRestAdapterTest {
                 .expectStatus().isNoContent();
 
         Mockito.verify(userInputPort, times(1)).delete(anyLong());
+    }
+
+    @Test
+    @DisplayName("When Password Is Correct Expect Password Changed Successfully")
+    void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() throws JsonProcessingException {
+        ChangePasswordRequest changePasswordRequest = TestUtilUser.buildChangePasswordRequestMock();
+        User user = TestUtilUser.buildUserMock();
+        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
+
+        when(userRestMapper.toUser(any(ChangePasswordRequest.class))).thenReturn(user);
+        when(userInputPort.changePassword(anyLong(), any(User.class))).thenReturn(Mono.just(user));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.put()
+                .uri("/users/{id}/change-password", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(changePasswordRequest))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(ChangePasswordRequest.class));
+        Mockito.verify(userInputPort, times(1)).changePassword(anyLong(), any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 
 

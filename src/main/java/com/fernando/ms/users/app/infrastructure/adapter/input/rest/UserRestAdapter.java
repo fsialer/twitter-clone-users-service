@@ -4,6 +4,7 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest;
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.domain.exceptions.CustomValidationException;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
@@ -57,5 +58,13 @@ public class UserRestAdapter{
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> update(@PathVariable Long id){
         return userInputPort.delete(id);
+    }
+
+    @PutMapping("/{id}/change-password")
+    public Mono<ResponseEntity<UserResponse>> changePassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordRequest rq){
+        return userInputPort.changePassword(id,userRestMapper.toUser(rq))
+                .flatMap(user->{
+                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
+                });
     }
 }

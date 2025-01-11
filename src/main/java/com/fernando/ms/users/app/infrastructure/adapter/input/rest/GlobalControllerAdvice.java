@@ -1,14 +1,11 @@
 package com.fernando.ms.users.app.infrastructure.adapter.input.rest;
 
-import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
-import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
-import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
+import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -68,11 +65,35 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(UserEmailAlreadyExistsException.class)
     public  Mono<ErrorResponse> handleUserEmailUserAlreadyExistsException(UserEmailAlreadyExistsException e) {
         return Mono.just(ErrorResponse.builder()
-                .code(USER_EMAIL_USER__ALREADY_EXISTS.getCode())
+                .code(USER_EMAIL_USER_ALREADY_EXISTS.getCode())
                 .type(FUNCTIONAL)
-                .message(USER_EMAIL_USER__ALREADY_EXISTS.getMessage())
+                .message(USER_EMAIL_USER_ALREADY_EXISTS.getMessage())
                 .timestamp(LocalDate.now().toString())
                 .details(Collections.singletonList(e.getMessage()))
+                .build());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CredentialFailedException.class)
+    public  Mono<ErrorResponse> handleCredentialFailedException(CredentialFailedException e) {
+        return Mono.just(ErrorResponse.builder()
+                .code(USER_CREDENTIAL_FAIL.getCode())
+                .type(FUNCTIONAL)
+                .message(USER_CREDENTIAL_FAIL.getMessage())
+                .timestamp(LocalDate.now().toString())
+                //.details(Collections.singletonList(e.getMessage()))
+                .build());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordNotConfirmException.class)
+    public  Mono<ErrorResponse> handlePasswordNotConfirmException(PasswordNotConfirmException e) {
+        return Mono.just(ErrorResponse.builder()
+                .code(USER_PASSWORD_NO_CONFIRM.getCode())
+                .type(FUNCTIONAL)
+                .message(USER_PASSWORD_NO_CONFIRM.getMessage())
+                .timestamp(LocalDate.now().toString())
+                //.details(Collections.singletonList(e.getMessage()))
                 .build());
     }
 

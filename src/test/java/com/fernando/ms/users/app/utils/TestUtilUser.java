@@ -1,6 +1,7 @@
 package com.fernando.ms.users.app.utils;
 
 import com.fernando.ms.users.app.domain.models.User;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
@@ -57,4 +58,14 @@ public class TestUtilUser {
                 .email("asialer05@hotmail.com")
                 .build();
     }
+
+    public static ChangePasswordRequest buildChangePasswordRequestMock(){
+        return  ChangePasswordRequest.builder()
+                .password("123456")
+                .newPassword("1234567")
+                .confirmPassword("1234567")
+                .build();
+    }
+
+
 }

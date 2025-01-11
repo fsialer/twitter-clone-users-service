@@ -2,13 +2,12 @@ package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
-import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
-import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
+import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.GlobalControllerAdvice;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.utils.ErrorCatalog;
@@ -22,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -123,8 +121,8 @@ public class GlobalControllerAdviceTest {
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class)
                 .value(response -> {
-                    assert response.getCode().equals(ErrorCatalog.USER_EMAIL_USER__ALREADY_EXISTS.getCode());
-                    assert response.getMessage().equals(ErrorCatalog.USER_EMAIL_USER__ALREADY_EXISTS.getMessage());
+                    assert response.getCode().equals(ErrorCatalog.USER_EMAIL_USER_ALREADY_EXISTS.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_EMAIL_USER_ALREADY_EXISTS.getMessage());
                     assert response.getDetails().contains("User email: "+createUserRequest.getEmail()+" already exists!");
                 });
     }
@@ -150,6 +148,45 @@ public class GlobalControllerAdviceTest {
                 .value(response -> {
                     assert response.getCode().equals(ErrorCatalog.USER_BAD_PARAMETERS.getCode());
                     assert response.getMessage().equals(ErrorCatalog.USER_BAD_PARAMETERS.getMessage());
+                });
+    }
+
+    @Test
+    @DisplayName("Expect CredentialFailedException When Credentials Fail")
+    void Expect_CredentialFailedException_When_CredentialsFail() throws JsonProcessingException {
+        ChangePasswordRequest rq= TestUtilUser.buildChangePasswordRequestMock();
+        when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new CredentialFailedException()));
+
+        webTestClient.put()
+                .uri("/users/{id}/change-password", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(rq))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(ErrorCatalog.USER_CREDENTIAL_FAIL.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_CREDENTIAL_FAIL.getMessage());
+                });
+    }
+
+    @Test
+    @DisplayName("Expect PasswordNotConfirmException When Passwords Do Not Match")
+    void Expect_PasswordNotConfirmException_When_PasswordsDoNotMatch() throws JsonProcessingException {
+        ChangePasswordRequest rq= TestUtilUser.buildChangePasswordRequestMock();
+        rq.setConfirmPassword("124");
+        when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new PasswordNotConfirmException()));
+
+        webTestClient.put()
+                .uri("/users/{id}/change-password", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(rq))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assert response.getCode().equals(ErrorCatalog.USER_PASSWORD_NO_CONFIRM.getCode());
+                    assert response.getMessage().equals(ErrorCatalog.USER_PASSWORD_NO_CONFIRM.getMessage());
                 });
     }
 }

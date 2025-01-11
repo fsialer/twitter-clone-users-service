@@ -13,6 +13,8 @@ public class User {
     private String names;
     private String email;
     private String password;
+    private String newPassword;
+    private String confirmPassword;
     private String passwordHash;
     private String passwordSalt;
 

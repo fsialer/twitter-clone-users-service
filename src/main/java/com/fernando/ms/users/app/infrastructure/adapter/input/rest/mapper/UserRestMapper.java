@@ -1,6 +1,7 @@
 package com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper;
 
 import com.fernando.ms.users.app.domain.models.User;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
@@ -26,6 +27,8 @@ public interface UserRestMapper {
 
     User toUser(CreateUserRequest rq);
     User toUser(UpdateUserRequest rq);
+
+    User toUser(ChangePasswordRequest rq);
 
     //UserResponse toUserResponse(User user);
 }

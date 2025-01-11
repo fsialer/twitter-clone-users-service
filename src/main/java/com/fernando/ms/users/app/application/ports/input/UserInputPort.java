@@ -10,5 +10,6 @@ public interface UserInputPort {
     Mono<User> save(User user);
     Mono<User> update(Long id,User user);
     Mono<Void> delete(Long id);
+    Mono<User> changePassword(Long id, User user);
 }
    

@@ -1,9 +1,7 @@
 package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
-import com.fernando.ms.users.app.domain.exceptions.UserEmailAlreadyExistsException;
-import com.fernando.ms.users.app.domain.exceptions.UserNotFoundException;
-import com.fernando.ms.users.app.domain.exceptions.UserUsernameAlreadyExistsException;
+import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
 import com.fernando.ms.users.app.utils.TestUtilUser;
@@ -209,5 +207,83 @@ public class UserServiceTest {
 
         Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
         Mockito.verify(userPersistencePort, Mockito.never()).delete(anyLong());
+    }
+
+    @Test
+    @DisplayName("When Password Is Correct Expect Password Changed Successfully")
+    void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() {
+        User user = TestUtilUser.buildUserMock();
+        User updatedUser = TestUtilUser.buildUserMock();
+        updatedUser.setPassword("newPassword");
+        updatedUser.setNewPassword("newPassword");
+        updatedUser.setConfirmPassword("newPassword");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
+        when(passwordUtils.generateSalt()).thenReturn("newSalt");
+        when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("newHashedPassword");
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
+
+        Mono<User> result = userService.changePassword(1L, updatedUser);
+
+        StepVerifier.create(result)
+                .expectNext(updatedUser)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
+        Mockito.verify(passwordUtils, times(1)).generateSalt();
+        Mockito.verify(passwordUtils, times(1)).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Expect CredentialFailedException When Password Validation Fails")
+    void Expect_CredentialFailedException_When_PasswordValidationFails() {
+        User user = TestUtilUser.buildUserMock();
+        User updatedUser = TestUtilUser.buildUserMock();
+        updatedUser.setPassword("newPassword");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+
+        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class)))
+                .thenReturn(false);
+
+        Mono<User> result = userService.changePassword(1L, updatedUser);
+
+        StepVerifier.create(result)
+                .expectError(CredentialFailedException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
+        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
+        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Expect PasswordNotConfirmException When New Passwords Do Not Match")
+    void Expect_PasswordNotConfirmException_When_NewPasswordsDoNotMatch() {
+        User user = TestUtilUser.buildUserMock();
+        User updatedUser = TestUtilUser.buildUserMock();
+        updatedUser.setPassword("oldPassword");
+        updatedUser.setNewPassword("newPassword");
+        updatedUser.setConfirmPassword("differentPassword");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
+
+        Mono<User> result = userService.changePassword(1L, updatedUser);
+
+        StepVerifier.create(result)
+                .expectError(PasswordNotConfirmException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
+        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
+        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 }
