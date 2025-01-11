@@ -286,4 +286,63 @@ public class UserServiceTest {
         Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
+
+    @Test
+    @DisplayName("When Authentication Is Successful Expect User Returned")
+    void When_AuthenticationIsSuccessful_Expect_UserReturned() {
+        User user = TestUtilUser.buildUserMock();
+        User userInfo = TestUtilUser.buildUserMock();
+        userInfo.setPasswordSalt("salt");
+        userInfo.setPasswordHash("hashedPassword");
+
+        when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
+        when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(true);
+
+        Mono<User> result = userService.authentication(user);
+
+        StepVerifier.create(result)
+                .expectNext(userInfo)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
+        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Expect CredentialFailedException When Password Validation Of User Fails")
+    void Expect_CredentialFailedException_When_PasswordValidationOfUserFails() {
+        User user = TestUtilUser.buildUserMock();
+        User userInfo = TestUtilUser.buildUserMock();
+        userInfo.setPasswordSalt("salt");
+        userInfo.setPasswordHash("hashedPassword");
+
+        when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
+        when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(false);
+
+        Mono<User> result = userService.authentication(user);
+
+        StepVerifier.create(result)
+                .expectError(CredentialFailedException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
+        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Expect UserNotFoundException When User Not Found")
+    void Expect_UserNotFoundException_When_UserNotFound() {
+        User user = TestUtilUser.buildUserMock();
+
+        when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.empty());
+
+        Mono<User> result = userService.authentication(user);
+
+        StepVerifier.create(result)
+                .expectError(UserNotFoundException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
+        Mockito.verify(passwordUtils, Mockito.never()).validatePassword(anyString(), anyString(), anyString());
+    }
 }

@@ -94,4 +94,16 @@ public class UserService implements UserInputPort {
                     return userPersistencePort.save(userInfo);
                 });
     }
+
+    @Override
+    public Mono<User> authentication(User user) {
+        return userPersistencePort.findByUsername(user.getUsername())
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(userInfo->{
+                    if(!passwordUtils.validatePassword(user.getPassword(),userInfo.getPasswordSalt(),userInfo.getPasswordHash())){
+                        return Mono.error(CredentialFailedException::new);
+                    }
+                    return Mono.just(userInfo);
+                });
+    }
 }

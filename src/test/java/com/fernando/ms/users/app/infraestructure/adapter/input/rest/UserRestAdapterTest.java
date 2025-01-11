@@ -9,6 +9,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRe
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
@@ -168,6 +169,32 @@ public class UserRestAdapterTest {
 
         Mockito.verify(userRestMapper, times(1)).toUser(any(ChangePasswordRequest.class));
         Mockito.verify(userInputPort, times(1)).changePassword(anyLong(), any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
+    }
+
+    @Test
+    @DisplayName("When Authentication Is Successful Expect User Returned")
+    void When_AuthenticationIsSuccessful_Expect_UserReturned() throws JsonProcessingException {
+        UserAuthRequest userAuthRequest = TestUtilUser.buildUserAuthRequestMock();
+        User user = TestUtilUser.buildUserMock();
+        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
+
+        when(userRestMapper.toUser(any(UserAuthRequest.class))).thenReturn(user);
+        when(userInputPort.authentication(any(User.class))).thenReturn(Mono.just(user));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.post()
+                .uri("/users/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(userAuthRequest))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(UserAuthRequest.class));
+        Mockito.verify(userInputPort, times(1)).authentication(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 

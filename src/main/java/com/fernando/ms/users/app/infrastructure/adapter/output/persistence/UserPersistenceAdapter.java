@@ -47,5 +47,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.deleteById(id);
     }
 
+    @Override
+    public Mono<User> findByUsername(String username) {
+        return userReactiveRepository.findByUsername(username).map(userPersistenceMapper::toUser);
+    }
+
 
 }

@@ -123,4 +123,23 @@ public class UserPersistenceAdapterTest {
         Mockito.verify(userReactiveRepository, times(1)).deleteById(anyLong());
     }
 
+    @Test
+    @DisplayName("When Username Is Correct Expect User Information Correct")
+    void When_UsernameIsCorrect_Expect_UserInformationCorrect() {
+        User user = TestUtilUser.buildUserMock();
+        UserEntity userEntity = TestUtilUser.buildUserEntityMock();
+
+        when(userReactiveRepository.findByUsername(anyString())).thenReturn(Mono.just(userEntity));
+        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(user);
+
+        Mono<User> result = userPersistenceAdapter.findByUsername("testuser");
+
+        StepVerifier.create(result)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).findByUsername(anyString());
+        Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
+    }
+
 }

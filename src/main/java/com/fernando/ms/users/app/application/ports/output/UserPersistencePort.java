@@ -11,4 +11,5 @@ public interface UserPersistencePort {
     Mono<Boolean> existsByEmail(String email);
     Mono<Boolean> existsByUsername(String username);
     Mono<Void> delete(Long id);
+    Mono<User> findByUsername(String username);
 }
