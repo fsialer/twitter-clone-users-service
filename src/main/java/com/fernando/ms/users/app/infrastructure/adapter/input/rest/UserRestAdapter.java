@@ -9,6 +9,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -50,5 +51,11 @@ public class UserRestAdapter{
                 .flatMap(user->{
                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
                 });
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> update(@PathVariable Long id){
+        return userInputPort.delete(id);
     }
 }

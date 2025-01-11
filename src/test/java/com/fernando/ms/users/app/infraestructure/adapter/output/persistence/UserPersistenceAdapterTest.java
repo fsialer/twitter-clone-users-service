@@ -112,4 +112,15 @@ public class UserPersistenceAdapterTest {
 
         Mockito.verify(userReactiveRepository,times(1)).existsByUsernameIgnoreCase(anyString());
     }
+
+    @Test
+    @DisplayName("When User Exists Expect User Deleted Successfully")
+    void When_UserExists_Expect_UserDeletedSuccessfully() {
+        when(userReactiveRepository.deleteById(anyLong())).thenReturn(Mono.empty());
+        Mono<Void> result = userPersistenceAdapter.delete(1L);
+        StepVerifier.create(result)
+                .verifyComplete();
+        Mockito.verify(userReactiveRepository, times(1)).deleteById(anyLong());
+    }
+
 }

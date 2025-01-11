@@ -70,4 +70,11 @@ public class UserService implements UserInputPort {
                     return userPersistencePort.save(userInfo);
                 });
     }
+
+    @Override
+    public Mono<Void> delete(Long id) {
+        return userPersistencePort.finById(id)
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(user->userPersistencePort.delete(id));
+    }
 }

@@ -131,6 +131,18 @@ public class UserRestAdapterTest {
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 
+    @Test
+    @DisplayName("When User Exists Expect User Deleted Successfully")
+    void When_UserExists_Expect_UserDeletedSuccessfully() {
+        when(userInputPort.delete(anyLong())).thenReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/users/{id}", 1L)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        Mockito.verify(userInputPort, times(1)).delete(anyLong());
+    }
 
 
 

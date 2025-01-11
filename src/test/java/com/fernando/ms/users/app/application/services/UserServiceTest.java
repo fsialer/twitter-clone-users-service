@@ -179,4 +179,35 @@ public class UserServiceTest {
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
+
+    @Test
+    @DisplayName("When User Exists Expect User Deleted Successfully")
+    void When_UserExists_Expect_UserDeletedSuccessfully() {
+        User user = TestUtilUser.buildUserMock();
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.delete(anyLong())).thenReturn(Mono.empty());
+
+        Mono<Void> result = userService.delete(1L);
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).delete(anyLong());
+    }
+
+    @Test
+    @DisplayName("Expect UserNotFoundException When User Does Not Exist")
+    void Expect_UserNotFoundException_When_UserDoesNotExist() {
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.empty());
+
+        Mono<Void> result = userService.delete(1L);
+
+        StepVerifier.create(result)
+                .expectError(UserNotFoundException.class)
+                .verify();
+
+        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, Mockito.never()).delete(anyLong());
+    }
 }

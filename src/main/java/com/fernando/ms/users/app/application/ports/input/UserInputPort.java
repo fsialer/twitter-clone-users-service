@@ -9,5 +9,6 @@ public interface UserInputPort {
     Mono<User> finById(Long id);
     Mono<User> save(User user);
     Mono<User> update(Long id,User user);
+    Mono<Void> delete(Long id);
 }
    

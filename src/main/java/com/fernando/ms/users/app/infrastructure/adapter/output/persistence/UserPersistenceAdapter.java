@@ -42,5 +42,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.existsByUsernameIgnoreCase(username);
     }
 
+    @Override
+    public Mono<Void> delete(Long id) {
+        return userReactiveRepository.deleteById(id);
+    }
+
 
 }
