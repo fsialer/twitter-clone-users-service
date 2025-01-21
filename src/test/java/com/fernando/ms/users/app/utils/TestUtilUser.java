@@ -5,6 +5,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 
@@ -72,6 +73,12 @@ public class TestUtilUser {
         return  UserAuthRequest.builder()
                 .username("falex")
                 .password("1234567")
+                .build();
+    }
+
+    public static ExistsUserResponse buildExistsUserResponseMock(){
+        return  ExistsUserResponse.builder()
+                .exists(true)
                 .build();
     }
 

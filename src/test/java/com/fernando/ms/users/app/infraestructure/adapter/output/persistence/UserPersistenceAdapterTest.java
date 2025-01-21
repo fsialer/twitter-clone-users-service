@@ -142,4 +142,17 @@ public class UserPersistenceAdapterTest {
         Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
     }
 
+    @Test
+    @DisplayName("When User Verification Is Successful Expect User Verified")
+    void When_UserVerificationIsSuccessful_Expect_UserVerified() {
+        when(userReactiveRepository.existsById(anyLong())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = userPersistenceAdapter.verifyUser(1L);
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).existsById(anyLong());
+    }
 }

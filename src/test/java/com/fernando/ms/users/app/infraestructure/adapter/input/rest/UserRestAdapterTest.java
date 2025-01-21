@@ -10,6 +10,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -196,6 +196,44 @@ public class UserRestAdapterTest {
         Mockito.verify(userRestMapper, times(1)).toUser(any(UserAuthRequest.class));
         Mockito.verify(userInputPort, times(1)).authentication(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
+    }
+
+    @Test
+    @DisplayName("When User Verification Is Successful Expect User Verified")
+    void When_UserVerificationIsSuccessful_Expect_UserVerified() {
+        ExistsUserResponse existsUserResponse = TestUtilUser.buildExistsUserResponseMock();
+
+        when(userInputPort.verifyUser(anyLong())).thenReturn(Mono.just(true));
+        when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(existsUserResponse);
+
+        webTestClient.get()
+                .uri("/users/{id}/verify", 1L)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.exists").isEqualTo(true);
+
+        Mockito.verify(userInputPort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userRestMapper, times(1)).toExistsUserResponse(anyBoolean());
+    }
+
+    @Test
+    @DisplayName("When User Verification Is Incorrect Expect User Do Not Verified")
+    void When_UserVerificationIsIncorrect_Expect_UserDoNotVerified() {
+        ExistsUserResponse existsUserResponse = TestUtilUser.buildExistsUserResponseMock();
+        existsUserResponse.setExists(false);
+        when(userInputPort.verifyUser(anyLong())).thenReturn(Mono.just(false));
+        when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(existsUserResponse);
+
+        webTestClient.get()
+                .uri("/users/{id}/verify", 1L)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.exists").isEqualTo(false);
+
+        Mockito.verify(userInputPort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userRestMapper, times(1)).toExistsUserResponse(anyBoolean());
     }
 
 

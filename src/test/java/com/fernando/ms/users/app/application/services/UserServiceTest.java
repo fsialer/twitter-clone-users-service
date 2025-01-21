@@ -18,6 +18,7 @@ import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -344,5 +345,35 @@ public class UserServiceTest {
 
         Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
         Mockito.verify(passwordUtils, Mockito.never()).validatePassword(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("When User Verification Is Successful Expect User Verified")
+    void When_UserVerificationIsSuccessful_Expect_UserVerified() {
+
+        when(userPersistencePort.verifyUser(anyLong())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = userService.verifyUser(1L);
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyLong());
+    }
+
+    @Test
+    @DisplayName("When User Verification Is Incorrect Expect User Do Not Verified")
+    void When_UserVerificationIsIncorrect_Expect_UserDoNotVerified() {
+
+        when(userPersistencePort.verifyUser(anyLong())).thenReturn(Mono.just(false));
+
+        Mono<Boolean> result = userService.verifyUser(1L);
+
+        StepVerifier.create(result)
+                .expectNext(false)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyLong());
     }
 }
