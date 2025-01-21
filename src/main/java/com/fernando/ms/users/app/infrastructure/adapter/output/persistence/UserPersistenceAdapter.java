@@ -52,5 +52,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.findByUsername(username).map(userPersistenceMapper::toUser);
     }
 
+    @Override
+    public Mono<Boolean> verifyUser(Long id) {
+        return userReactiveRepository.existsById(id);
+    }
+
 
 }

@@ -106,4 +106,9 @@ public class UserService implements UserInputPort {
                     return Mono.just(userInfo);
                 });
     }
+
+    @Override
+    public Mono<Boolean> verifyUser(Long id) {
+        return userPersistencePort.verifyUser(id);
+    }
 }

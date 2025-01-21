@@ -8,6 +8,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,14 @@ public class UserRestAdapter{
         return userInputPort.authentication(userRestMapper.toUser(rq))
                 .flatMap(user->{
                     return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
+                });
+    }
+
+    @GetMapping("/{id}/verify")
+    public Mono<ResponseEntity<ExistsUserResponse>> verify(@PathVariable("id") Long id){
+        return userInputPort.verifyUser(id)
+                .flatMap(user->{
+                    return Mono.just(ResponseEntity.ok(userRestMapper.toExistsUserResponse(user)));
                 });
     }
 }

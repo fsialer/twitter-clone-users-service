@@ -12,5 +12,6 @@ public interface UserInputPort {
     Mono<Void> delete(Long id);
     Mono<User> changePassword(Long id, User user);
     Mono<User> authentication(User user);
+    Mono<Boolean> verifyUser(Long id);
 }
    
