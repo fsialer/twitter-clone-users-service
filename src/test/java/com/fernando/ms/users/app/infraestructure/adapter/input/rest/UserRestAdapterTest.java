@@ -236,6 +236,32 @@ public class UserRestAdapterTest {
         Mockito.verify(userRestMapper, times(1)).toExistsUserResponse(anyBoolean());
     }
 
+    @Test
+    @DisplayName("When User IDs Are Correct Expect Users Returned")
+    void When_UserIDsAreCorrect_Expect_UsersReturned() {
+        UserResponse userResponse1 = TestUtilUser.buildUserResponseMock();
+        UserResponse userResponse2 = TestUtilUser.buildUserResponseMock();
+        userResponse2.setId(2L);
+        User user1 = TestUtilUser.buildUserMock();
+        User user2 = TestUtilUser.buildUserMock();
+        user2.setId(2L);
+
+        when(userInputPort.findByIds(anyList())).thenReturn(Flux.just(user1, user2));
+        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(userResponse1, userResponse2));
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/users/find-by-ids")
+                        .queryParam("ids", "1,2")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserResponse.class)
+                .contains(userResponse1, userResponse2);
+
+        Mockito.verify(userInputPort, times(1)).findByIds(anyList());
+        Mockito.verify(userRestMapper, times(1)).toUsersResponse(any(Flux.class));
+    }
+
 
 
 }

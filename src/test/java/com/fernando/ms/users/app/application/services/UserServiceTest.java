@@ -16,6 +16,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -375,5 +377,24 @@ public class UserServiceTest {
                 .verifyComplete();
 
         Mockito.verify(userPersistencePort, times(1)).verifyUser(anyLong());
+    }
+
+    @Test
+    @DisplayName("When User IDs Are Correct Expect Users Returned")
+    void When_UserIDsAreCorrect_Expect_UsersReturned() {
+        User user1 = TestUtilUser.buildUserMock();
+        User user2 = TestUtilUser.buildUserMock();
+        user2.setId(2L);
+
+        when(userPersistencePort.findByIds(anyIterable())).thenReturn(Flux.just(user1, user2));
+
+        Flux<User> result = userService.findByIds(List.of(1L, 2L));
+
+        StepVerifier.create(result)
+                .expectNext(user1)
+                .expectNext(user2)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findByIds(anyIterable());
     }
 }

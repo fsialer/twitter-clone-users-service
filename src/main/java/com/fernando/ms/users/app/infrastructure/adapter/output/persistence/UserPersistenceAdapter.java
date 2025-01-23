@@ -57,5 +57,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.existsById(id);
     }
 
+    @Override
+    public Flux<User> findByIds(Iterable<Long> ids) {
+        return userPersistenceMapper.toUsers(userReactiveRepository.findAllById(ids));
+    }
+
 
 }

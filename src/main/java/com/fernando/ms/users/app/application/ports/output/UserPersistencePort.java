@@ -13,4 +13,5 @@ public interface UserPersistencePort {
     Mono<Void> delete(Long id);
     Mono<User> findByUsername(String username);
     Mono<Boolean> verifyUser(Long id);
+    Flux<User> findByIds(Iterable<Long> id);
 }

@@ -2,7 +2,6 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest;
 
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
-import com.fernando.ms.users.app.domain.exceptions.CustomValidationException;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
@@ -14,13 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,5 +82,10 @@ public class UserRestAdapter{
                 .flatMap(user->{
                     return Mono.just(ResponseEntity.ok(userRestMapper.toExistsUserResponse(user)));
                 });
+    }
+
+    @GetMapping("/find-by-ids")
+    public Flux<UserResponse> findByIds(@RequestParam("ids") List<Long> ids){
+        return userRestMapper.toUsersResponse(userInputPort.findByIds(ids));
     }
 }

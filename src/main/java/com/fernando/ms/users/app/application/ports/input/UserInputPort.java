@@ -13,5 +13,6 @@ public interface UserInputPort {
     Mono<User> changePassword(Long id, User user);
     Mono<User> authentication(User user);
     Mono<Boolean> verifyUser(Long id);
+    Flux<User> findByIds(Iterable<Long> ids);
 }
    

@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.sql.SQLOutput;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -110,5 +108,10 @@ public class UserService implements UserInputPort {
     @Override
     public Mono<Boolean> verifyUser(Long id) {
         return userPersistencePort.verifyUser(id);
+    }
+
+    @Override
+    public Flux<User> findByIds(Iterable<Long> ids) {
+        return userPersistencePort.findByIds(ids);
     }
 }

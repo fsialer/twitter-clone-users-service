@@ -17,6 +17,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -154,5 +156,29 @@ public class UserPersistenceAdapterTest {
                 .verifyComplete();
 
         Mockito.verify(userReactiveRepository, times(1)).existsById(anyLong());
+    }
+
+    @Test
+    @DisplayName("When User IDs Are Correct Expect Users Returned")
+    void When_UserIDsAreCorrect_Expect_UsersReturned() {
+        User user1 = TestUtilUser.buildUserMock();
+        User user2 = TestUtilUser.buildUserMock();
+        user2.setId(2L);
+        UserEntity userEntity1 = TestUtilUser.buildUserEntityMock();
+        UserEntity userEntity2 = TestUtilUser.buildUserEntityMock();
+        userEntity2.setId(2L);
+
+        when(userReactiveRepository.findAllById(anyIterable())).thenReturn(Flux.just(userEntity1, userEntity2));
+        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(user1, user2));
+
+        Flux<User> result = userPersistenceAdapter.findByIds(List.of(1L, 2L));
+
+        StepVerifier.create(result)
+                .expectNext(user1)
+                .expectNext(user2)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).findAllById(anyIterable());
+        Mockito.verify(userPersistenceMapper, times(1)).toUsers(any(Flux.class));
     }
 }
