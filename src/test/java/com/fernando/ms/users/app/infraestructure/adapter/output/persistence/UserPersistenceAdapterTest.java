@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserPersistenceAdapterTest {
+class UserPersistenceAdapterTest {
     @Mock
     private UserReactiveRepository userReactiveRepository;
 
@@ -38,13 +38,11 @@ public class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When Users Are Correct Expect A List Users Correct")
     void When_UsersAreCorrect_Expect_AListUsersCorrect() {
-        User user= TestUtilUser.buildUserMock();
-        UserEntity userEntity= TestUtilUser.buildUserEntityMock();
-        when(userReactiveRepository.findAll()).thenReturn(Flux.just(userEntity));
-        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(user));
+        when(userReactiveRepository.findAll()).thenReturn(Flux.just(TestUtilUser.buildUserEntityMock()));
+        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just( TestUtilUser.buildUserMock()));
         Flux<User> result = userPersistenceAdapter.findAll();
         StepVerifier.create(result)
-                .expectNext(user)
+                .expectNext( TestUtilUser.buildUserMock())
                 .verifyComplete();
         Mockito.verify(userReactiveRepository,times(1)).findAll();
         Mockito.verify(userPersistenceMapper,times(1)).toUsers(any(Flux.class));
@@ -53,14 +51,12 @@ public class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When User Identifier Is Correct Expect User Information Correct")
     void When_UserIdentifierIsCorrect_Expect_UserInformationCorrect(){
-        User user= TestUtilUser.buildUserMock();
-        UserEntity userEntity= TestUtilUser.buildUserEntityMock();
-        when(userReactiveRepository.findById(anyLong())).thenReturn(Mono.just(userEntity));
-        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(user);
+        when(userReactiveRepository.findById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserEntityMock()));
+        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
 
         Mono<User> result=userPersistenceAdapter.finById(1L);
         StepVerifier.create(result)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
         Mockito.verify(userReactiveRepository,times(1)).findById(anyLong());
         Mockito.verify(userPersistenceMapper,times(1)).toUser(any(UserEntity.class));
@@ -69,16 +65,14 @@ public class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
     void When_User_Information_Is_Correct_Expect_User_Information_Saved_Successfully() {
-        User user= TestUtilUser.buildUserMock();
-        UserEntity userEntity= TestUtilUser.buildUserEntityMock();
-        when(userReactiveRepository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
-        when(userPersistenceMapper.toUserEntity(any(User.class))).thenReturn(userEntity);
-        when(userPersistenceMapper.toUser(any(Mono.class))).thenReturn(Mono.just(user));
+        when(userReactiveRepository.save(any(UserEntity.class))).thenReturn(Mono.just(TestUtilUser.buildUserEntityMock()));
+        when(userPersistenceMapper.toUserEntity(any(User.class))).thenReturn(TestUtilUser.buildUserEntityMock());
+        when(userPersistenceMapper.toUser(any(Mono.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
 
-        Mono<User> savedUser = userPersistenceAdapter.save(user);
+        Mono<User> savedUser = userPersistenceAdapter.save(TestUtilUser.buildUserMock());
 
         StepVerifier.create(savedUser)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
 
         Mockito.verify(userReactiveRepository,times(1)).save(any(UserEntity.class));
@@ -128,16 +122,13 @@ public class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When Username Is Correct Expect User Information Correct")
     void When_UsernameIsCorrect_Expect_UserInformationCorrect() {
-        User user = TestUtilUser.buildUserMock();
-        UserEntity userEntity = TestUtilUser.buildUserEntityMock();
-
-        when(userReactiveRepository.findByUsername(anyString())).thenReturn(Mono.just(userEntity));
-        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(user);
+        when(userReactiveRepository.findByUsername(anyString())).thenReturn(Mono.just( TestUtilUser.buildUserEntityMock()));
+        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
 
         Mono<User> result = userPersistenceAdapter.findByUsername("testuser");
 
         StepVerifier.create(result)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
 
         Mockito.verify(userReactiveRepository, times(1)).findByUsername(anyString());
@@ -161,20 +152,18 @@ public class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
-        User user1 = TestUtilUser.buildUserMock();
         User user2 = TestUtilUser.buildUserMock();
         user2.setId(2L);
-        UserEntity userEntity1 = TestUtilUser.buildUserEntityMock();
         UserEntity userEntity2 = TestUtilUser.buildUserEntityMock();
         userEntity2.setId(2L);
 
-        when(userReactiveRepository.findAllById(anyIterable())).thenReturn(Flux.just(userEntity1, userEntity2));
-        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(user1, user2));
+        when(userReactiveRepository.findAllById(anyIterable())).thenReturn(Flux.just(TestUtilUser.buildUserEntityMock(), userEntity2));
+        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(TestUtilUser.buildUserMock(), user2));
 
         Flux<User> result = userPersistenceAdapter.findByIds(List.of(1L, 2L));
 
         StepVerifier.create(result)
-                .expectNext(user1)
+                .expectNext(TestUtilUser.buildUserMock())
                 .expectNext(user2)
                 .verifyComplete();
 

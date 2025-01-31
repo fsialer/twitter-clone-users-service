@@ -18,7 +18,6 @@ import reactor.test.StepVerifier;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserPersistencePort userPersistencePort;
@@ -40,12 +39,11 @@ public class UserServiceTest {
     @Test
     @DisplayName("When Users Information Is Correct Expect A List Users")
     void When_UsersInformationIsCorrect_Expect_AListUsers(){
-        User user= TestUtilUser.buildUserMock();
-        when(userPersistencePort.findAll()).thenReturn(Flux.just(user));
+        when(userPersistencePort.findAll()).thenReturn(Flux.just(TestUtilUser.buildUserMock()));
 
         Flux<User> users=userService.findAll();
         StepVerifier.create(users)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
         Mockito.verify(userPersistencePort,times(1)).findAll();
     }
@@ -53,11 +51,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("When User Identifier Is Correct Except User Information Correct")
     void When_UserIdentifierIsCorrect_Except_UserInformationCorrect(){
-        User user= TestUtilUser.buildUserMock();
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
         Mono<User> userMono=userService.finById(1L);
         StepVerifier.create(userMono)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
         Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
     }
@@ -65,7 +62,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect UserNotFoundException When User Identifier Is Invalid")
     void Expect_UserNotFoundException_When_UserIdentifierIsInvalid(){
-        User user= TestUtilUser.buildUserMock();
         when(userPersistencePort.finById(anyLong())).thenReturn(Mono.empty());
         Mono<User> userMono=userService.finById(1L);
         StepVerifier.create(userMono)
@@ -78,17 +74,16 @@ public class UserServiceTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() {
-        User user=TestUtilUser.buildUserMock();
         when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
         when(passwordUtils.generateSalt()).thenReturn("salt");
         when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
-        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(user));
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
 
-        Mono<User> savedUser = userService.save(user);
+        Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
 
         StepVerifier.create(savedUser)
-                .expectNext(user)
+                .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
 
         Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
@@ -101,10 +96,9 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect UserUsernameAlreadyExistsException When Username Already Exists")
     void Expect_UserUsernameAlreadyExistsException_When_UsernameAlreadyExists() {
-        User user=TestUtilUser.buildUserMock();
         when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(true));
 
-        Mono<User> savedUser = userService.save(user);
+        Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
 
         StepVerifier.create(savedUser)
                 .expectError(UserUsernameAlreadyExistsException.class)
@@ -120,11 +114,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect UserEmailAlreadyExistsException When Username Already Exists")
     void Expect_UserEmailAlreadyExistsException_When_UsernameAlreadyExists() {
-        User user=TestUtilUser.buildUserMock();
         when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
 
-        Mono<User> savedUser = userService.save(user);
+        Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
 
         StepVerifier.create(savedUser)
                 .expectError(UserEmailAlreadyExistsException.class)
@@ -140,11 +133,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() {
-        User existingUser = TestUtilUser.buildUserMock();
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setEmail("newemail@example.com");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(existingUser));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
 
@@ -162,11 +154,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
     void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() {
-        User existingUser = TestUtilUser.buildUserMock();
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setEmail("newemail@example.com");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(existingUser));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
 
         Mono<User> result = userService.update(1L, updatedUser);
@@ -184,8 +175,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("When User Exists Expect User Deleted Successfully")
     void When_UserExists_Expect_UserDeletedSuccessfully() {
-        User user = TestUtilUser.buildUserMock();
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
         when(userPersistencePort.delete(anyLong())).thenReturn(Mono.empty());
 
         Mono<Void> result = userService.delete(1L);
@@ -215,13 +205,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("When Password Is Correct Expect Password Changed Successfully")
     void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() {
-        User user = TestUtilUser.buildUserMock();
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setPassword("newPassword");
         updatedUser.setNewPassword("newPassword");
         updatedUser.setConfirmPassword("newPassword");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
         when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
         when(passwordUtils.generateSalt()).thenReturn("newSalt");
         when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("newHashedPassword");
@@ -243,11 +232,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect CredentialFailedException When Password Validation Fails")
     void Expect_CredentialFailedException_When_PasswordValidationFails() {
-        User user = TestUtilUser.buildUserMock();
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setPassword("newPassword");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
 
         when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class)))
                 .thenReturn(false);
@@ -268,13 +256,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect PasswordNotConfirmException When New Passwords Do Not Match")
     void Expect_PasswordNotConfirmException_When_NewPasswordsDoNotMatch() {
-        User user = TestUtilUser.buildUserMock();
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setPassword("oldPassword");
         updatedUser.setNewPassword("newPassword");
         updatedUser.setConfirmPassword("differentPassword");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(user));
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
         when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
 
         Mono<User> result = userService.changePassword(1L, updatedUser);
@@ -293,7 +280,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("When Authentication Is Successful Expect User Returned")
     void When_AuthenticationIsSuccessful_Expect_UserReturned() {
-        User user = TestUtilUser.buildUserMock();
         User userInfo = TestUtilUser.buildUserMock();
         userInfo.setPasswordSalt("salt");
         userInfo.setPasswordHash("hashedPassword");
@@ -301,7 +287,7 @@ public class UserServiceTest {
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
         when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(true);
 
-        Mono<User> result = userService.authentication(user);
+        Mono<User> result = userService.authentication( TestUtilUser.buildUserMock());
 
         StepVerifier.create(result)
                 .expectNext(userInfo)
@@ -314,7 +300,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect CredentialFailedException When Password Validation Of User Fails")
     void Expect_CredentialFailedException_When_PasswordValidationOfUserFails() {
-        User user = TestUtilUser.buildUserMock();
         User userInfo = TestUtilUser.buildUserMock();
         userInfo.setPasswordSalt("salt");
         userInfo.setPasswordHash("hashedPassword");
@@ -322,7 +307,7 @@ public class UserServiceTest {
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
         when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(false);
 
-        Mono<User> result = userService.authentication(user);
+        Mono<User> result = userService.authentication( TestUtilUser.buildUserMock());
 
         StepVerifier.create(result)
                 .expectError(CredentialFailedException.class)
@@ -335,11 +320,9 @@ public class UserServiceTest {
     @Test
     @DisplayName("Expect UserNotFoundException When User Not Found")
     void Expect_UserNotFoundException_When_UserNotFound() {
-        User user = TestUtilUser.buildUserMock();
-
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.empty());
 
-        Mono<User> result = userService.authentication(user);
+        Mono<User> result = userService.authentication(TestUtilUser.buildUserMock());
 
         StepVerifier.create(result)
                 .expectError(UserNotFoundException.class)
@@ -382,16 +365,15 @@ public class UserServiceTest {
     @Test
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
-        User user1 = TestUtilUser.buildUserMock();
         User user2 = TestUtilUser.buildUserMock();
         user2.setId(2L);
 
-        when(userPersistencePort.findByIds(anyIterable())).thenReturn(Flux.just(user1, user2));
+        when(userPersistencePort.findByIds(anyIterable())).thenReturn(Flux.just( TestUtilUser.buildUserMock(), user2));
 
         Flux<User> result = userService.findByIds(List.of(1L, 2L));
 
         StepVerifier.create(result)
-                .expectNext(user1)
+                .expectNext(TestUtilUser.buildUserMock())
                 .expectNext(user2)
                 .verifyComplete();
 

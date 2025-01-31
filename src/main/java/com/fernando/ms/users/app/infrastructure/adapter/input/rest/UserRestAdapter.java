@@ -63,25 +63,19 @@ public class UserRestAdapter{
     @PutMapping("/{id}/change-password")
     public Mono<ResponseEntity<UserResponse>> changePassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordRequest rq){
         return userInputPort.changePassword(id,userRestMapper.toUser(rq))
-                .flatMap(user->{
-                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
-                });
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 
     @PostMapping("/auth")
     public Mono<ResponseEntity<UserResponse>> authentication(@Valid @RequestBody UserAuthRequest rq){
         return userInputPort.authentication(userRestMapper.toUser(rq))
-                .flatMap(user->{
-                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
-                });
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 
     @GetMapping("/{id}/verify")
     public Mono<ResponseEntity<ExistsUserResponse>> verify(@PathVariable("id") Long id){
         return userInputPort.verifyUser(id)
-                .flatMap(user->{
-                    return Mono.just(ResponseEntity.ok(userRestMapper.toExistsUserResponse(user)));
-                });
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toExistsUserResponse(user))));
     }
 
     @GetMapping("/find-by-ids")

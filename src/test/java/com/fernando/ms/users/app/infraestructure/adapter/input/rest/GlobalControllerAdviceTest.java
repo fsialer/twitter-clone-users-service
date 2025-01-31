@@ -3,7 +3,6 @@ package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fernando.ms.users.app.domain.exceptions.*;
-import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.GlobalControllerAdvice;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
@@ -17,9 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -29,12 +28,12 @@ import static org.mockito.Mockito.when;
 
 @WebFluxTest
 @Import(GlobalControllerAdvice.class)
-public class GlobalControllerAdviceTest {
+class GlobalControllerAdviceTest {
 
-    @MockBean
+    @MockitoBean
     private UserRestAdapter userRestAdapter;
 
-    @MockBean
+    @MockitoBean
     private UserRestMapper userRestMapper;
 
     @Autowired
@@ -87,8 +86,7 @@ public class GlobalControllerAdviceTest {
     @DisplayName("Expect UserUsernameAlreadyExistsException When Username Already Exists")
     void Expect_UserUsernameAlreadyExistsException_When_UsernameAlreadyExists() throws JsonProcessingException {
         CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
-        User user=TestUtilUser.buildUserMock();
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(TestUtilUser.buildUserMock());
         when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserUsernameAlreadyExistsException(createUserRequest.getUsername())));
 
         webTestClient.post()
@@ -109,8 +107,7 @@ public class GlobalControllerAdviceTest {
     @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
     void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() throws JsonProcessingException {
         CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
-        User user=TestUtilUser.buildUserMock();
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(TestUtilUser.buildUserMock());
         when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserEmailAlreadyExistsException(createUserRequest.getEmail())));
 
         webTestClient.post()
@@ -131,17 +128,12 @@ public class GlobalControllerAdviceTest {
     @Test
     @DisplayName("Expect WebExchangeBindException When User Information Is Invalid")
     void Expect_WebExchangeBindException_When_UserInformationIsInvalid() throws JsonProcessingException {
-        CreateUserRequest createUserRequest= CreateUserRequest.builder()
-                .username("falex")
-                .names("Fernando Sialer")
-                .email("prueba")
-                .password("123456")
-                .build();
-
+        CreateUserRequest rq=TestUtilUser.buildCreateUserRequestMock();
+        rq.setEmail("");
         webTestClient.post()
                 .uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(createUserRequest))
+                .bodyValue(objectMapper.writeValueAsString(rq))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class)
@@ -154,13 +146,12 @@ public class GlobalControllerAdviceTest {
     @Test
     @DisplayName("Expect CredentialFailedException When Credentials Fail")
     void Expect_CredentialFailedException_When_CredentialsFail() throws JsonProcessingException {
-        ChangePasswordRequest rq= TestUtilUser.buildChangePasswordRequestMock();
         when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new CredentialFailedException()));
 
         webTestClient.put()
                 .uri("/users/{id}/change-password", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(rq))
+                .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildChangePasswordRequestMock()))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class)

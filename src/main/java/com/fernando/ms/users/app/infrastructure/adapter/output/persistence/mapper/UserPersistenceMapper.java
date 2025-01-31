@@ -5,20 +5,20 @@ import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserPersistenceMapper {
     default Flux<User> toUsers(Flux<UserEntity> userEntities) {
-        return userEntities.map(this::toUser); // Convierte cada elemento individualmente
+        return userEntities.map(this::toUser);
     }
 
     default Mono<User> toUser(Mono<UserEntity> userEntities) {
-        return userEntities.map(this::toUser); // Convierte cada elemento individualmente
+        return userEntities.map(this::toUser);
     }
 
     User toUser(UserEntity userEntity);

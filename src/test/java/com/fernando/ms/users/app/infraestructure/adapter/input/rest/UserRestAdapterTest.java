@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,14 +29,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(UserRestAdapter.class)
-public class UserRestAdapterTest {
+class UserRestAdapterTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private UserInputPort userInputPort;
 
-    @MockBean
+    @MockitoBean
     private UserRestMapper userRestMapper;
 
     @Autowired
@@ -45,11 +45,8 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When Users Are Exists Expect Users Information Return Successfully")
     void When_UsersAreExists_Expect_UsersInformationReturnSuccessfully() {
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-        User user=TestUtilUser.buildUserMock();
-
-        when(userInputPort.findAll()).thenReturn(Flux.just(user));
-        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(userResponse));
+        when(userInputPort.findAll()).thenReturn(Flux.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(TestUtilUser.buildUserResponseMock()));
 
         webTestClient.get()
                 .uri("/users")
@@ -65,10 +62,8 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When UserIdentifier Is Correct Expect User Information Successfully")
     void When_UserIdentifierIsCorrect_Expect_UserInformationSuccessfully() {
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-        User user = TestUtilUser.buildUserMock();
-     when(userInputPort.finById(anyLong())).thenReturn(Mono.just(user));
-     when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just(userResponse));
+     when(userInputPort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+     when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just( TestUtilUser.buildUserResponseMock()));
      webTestClient.get()
              .uri("/users/{id}",1L)
              .exchange()
@@ -84,18 +79,14 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() throws JsonProcessingException {
-        CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
-        User user = TestUtilUser.buildUserMock();
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
-        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(TestUtilUser.buildUserMock());
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
                 .uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(createUserRequest))
+                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildCreateUserRequestMock()))
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
@@ -110,18 +101,14 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() throws JsonProcessingException {
-        UpdateUserRequest updateUserRequest = TestUtilUser.buildUpdateUserRequestMock();
-        User user = TestUtilUser.buildUserMock();
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-
-        when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn(user);
-        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+        when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn( TestUtilUser.buildUserMock());
+        when(userInputPort.update(anyLong(),any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.put()
                 .uri("/users/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(updateUserRequest))
+                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildUpdateUserRequestMock()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -129,7 +116,7 @@ public class UserRestAdapterTest {
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
         Mockito.verify(userRestMapper, times(1)).toUser(any(UpdateUserRequest.class));
-        Mockito.verify(userInputPort, times(1)).save(any(User.class));
+        Mockito.verify(userInputPort, times(1)).update(anyLong(),any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 
@@ -149,18 +136,14 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When Password Is Correct Expect Password Changed Successfully")
     void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() throws JsonProcessingException {
-        ChangePasswordRequest changePasswordRequest = TestUtilUser.buildChangePasswordRequestMock();
-        User user = TestUtilUser.buildUserMock();
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-
-        when(userRestMapper.toUser(any(ChangePasswordRequest.class))).thenReturn(user);
-        when(userInputPort.changePassword(anyLong(), any(User.class))).thenReturn(Mono.just(user));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+        when(userRestMapper.toUser(any(ChangePasswordRequest.class))).thenReturn( TestUtilUser.buildUserMock());
+        when(userInputPort.changePassword(anyLong(), any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.put()
                 .uri("/users/{id}/change-password", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(changePasswordRequest))
+                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildChangePasswordRequestMock()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -175,18 +158,14 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When Authentication Is Successful Expect User Returned")
     void When_AuthenticationIsSuccessful_Expect_UserReturned() throws JsonProcessingException {
-        UserAuthRequest userAuthRequest = TestUtilUser.buildUserAuthRequestMock();
-        User user = TestUtilUser.buildUserMock();
-        UserResponse userResponse = TestUtilUser.buildUserResponseMock();
-
-        when(userRestMapper.toUser(any(UserAuthRequest.class))).thenReturn(user);
-        when(userInputPort.authentication(any(User.class))).thenReturn(Mono.just(user));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
+        when(userRestMapper.toUser(any(UserAuthRequest.class))).thenReturn(TestUtilUser.buildUserMock());
+        when(userInputPort.authentication(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
                 .uri("/users/auth")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(userAuthRequest))
+                .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildUserAuthRequestMock()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -201,10 +180,8 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When User Verification Is Successful Expect User Verified")
     void When_UserVerificationIsSuccessful_Expect_UserVerified() {
-        ExistsUserResponse existsUserResponse = TestUtilUser.buildExistsUserResponseMock();
-
         when(userInputPort.verifyUser(anyLong())).thenReturn(Mono.just(true));
-        when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(existsUserResponse);
+        when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(TestUtilUser.buildExistsUserResponseMock());
 
         webTestClient.get()
                 .uri("/users/{id}/verify", 1L)
@@ -239,15 +216,13 @@ public class UserRestAdapterTest {
     @Test
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
-        UserResponse userResponse1 = TestUtilUser.buildUserResponseMock();
         UserResponse userResponse2 = TestUtilUser.buildUserResponseMock();
         userResponse2.setId(2L);
-        User user1 = TestUtilUser.buildUserMock();
         User user2 = TestUtilUser.buildUserMock();
         user2.setId(2L);
 
-        when(userInputPort.findByIds(anyList())).thenReturn(Flux.just(user1, user2));
-        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(userResponse1, userResponse2));
+        when(userInputPort.findByIds(anyList())).thenReturn(Flux.just(TestUtilUser.buildUserMock(), user2));
+        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just( TestUtilUser.buildUserResponseMock(), userResponse2));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/users/find-by-ids")
@@ -256,7 +231,7 @@ public class UserRestAdapterTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(UserResponse.class)
-                .contains(userResponse1, userResponse2);
+                .contains( TestUtilUser.buildUserResponseMock(), userResponse2);
 
         Mockito.verify(userInputPort, times(1)).findByIds(anyList());
         Mockito.verify(userRestMapper, times(1)).toUsersResponse(any(Flux.class));

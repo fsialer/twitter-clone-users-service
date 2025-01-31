@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -22,4 +23,9 @@ public class UserEntity {
     private String passwordSalt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username,email);
+    }
 }
