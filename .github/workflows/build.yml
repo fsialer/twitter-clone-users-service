@@ -21,9 +21,6 @@ jobs:
           java-version: 21
           distribution: 'corretto' # Alternative distribution options are available.
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-actions@v3
-
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
