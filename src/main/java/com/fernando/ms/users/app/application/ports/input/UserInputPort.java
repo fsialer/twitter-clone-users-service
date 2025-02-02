@@ -14,5 +14,6 @@ public interface UserInputPort {
     Mono<User> authentication(User user);
     Mono<Boolean> verifyUser(Long id);
     Flux<User> findByIds(Iterable<Long> ids);
+    Mono<User> findByUsername(String username);
 }
    

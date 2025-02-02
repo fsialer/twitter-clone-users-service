@@ -82,4 +82,12 @@ public class UserRestAdapter{
     public Flux<UserResponse> findByIds(@RequestParam("ids") List<Long> ids){
         return userRestMapper.toUsersResponse(userInputPort.findByIds(ids));
     }
+
+    @GetMapping("/{username}/username")
+    public Mono<ResponseEntity<UserResponse>> findByUsername(@PathVariable("username") String username){
+        return userInputPort.findByUsername(username)
+                .flatMap(user->{
+                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
+                });
+    }
 }
