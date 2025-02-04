@@ -49,7 +49,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(TestUtilUser.buildUserResponseMock()));
 
         webTestClient.get()
-                .uri("/users")
+                .uri("/v1/users")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -65,7 +65,7 @@ class UserRestAdapterTest {
      when(userInputPort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
      when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just( TestUtilUser.buildUserResponseMock()));
      webTestClient.get()
-             .uri("/users/{id}",1L)
+             .uri("/v1/users/{id}",1L)
              .exchange()
              .expectStatus().isOk()
              .expectBody()
@@ -84,7 +84,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
-                .uri("/users")
+                .uri("/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildCreateUserRequestMock()))
                 .exchange()
@@ -106,7 +106,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.put()
-                .uri("/users/{id}", 1L)
+                .uri("/v1/users/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildUpdateUserRequestMock()))
                 .exchange()
@@ -126,7 +126,7 @@ class UserRestAdapterTest {
         when(userInputPort.delete(anyLong())).thenReturn(Mono.empty());
 
         webTestClient.delete()
-                .uri("/users/{id}", 1L)
+                .uri("/v1/users/{id}", 1L)
                 .exchange()
                 .expectStatus().isNoContent();
 
@@ -141,7 +141,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.put()
-                .uri("/users/{id}/change-password", 1L)
+                .uri("/v1/users/{id}/change-password", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildChangePasswordRequestMock()))
                 .exchange()
@@ -163,7 +163,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
-                .uri("/users/auth")
+                .uri("/v1/users/auth")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildUserAuthRequestMock()))
                 .exchange()
@@ -184,7 +184,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(TestUtilUser.buildExistsUserResponseMock());
 
         webTestClient.get()
-                .uri("/users/{id}/verify", 1L)
+                .uri("/v1/users/{id}/verify", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -203,7 +203,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(existsUserResponse);
 
         webTestClient.get()
-                .uri("/users/{id}/verify", 1L)
+                .uri("/v1/users/{id}/verify", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -225,7 +225,7 @@ class UserRestAdapterTest {
         when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just( TestUtilUser.buildUserResponseMock(), userResponse2));
 
         webTestClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/find-by-ids")
+                .uri(uriBuilder -> uriBuilder.path("/v1/users/find-by-ids")
                         .queryParam("ids", "1,2")
                         .build())
                 .exchange()

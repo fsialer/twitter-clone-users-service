@@ -55,7 +55,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.findById(anyLong())).thenReturn(Mono.error(new UserNotFoundException()));
 
         webTestClient.get()
-                .uri("/users/1")
+                .uri("/v1/users/1")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -71,7 +71,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.findById(anyLong())).thenReturn(Mono.error(new RuntimeException("Unexpected error")));
 
         webTestClient.get()
-                .uri("/users/1")
+                .uri("/v1/users/1")
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ErrorResponse.class)
@@ -90,7 +90,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserUsernameAlreadyExistsException(createUserRequest.getUsername())));
 
         webTestClient.post()
-                .uri("/users")
+                .uri("/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(createUserRequest)) // Replace with actual request body
                 .exchange()
@@ -111,7 +111,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserEmailAlreadyExistsException(createUserRequest.getEmail())));
 
         webTestClient.post()
-                .uri("/users")
+                .uri("/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(createUserRequest)) // Replace with actual request body
                 .exchange()
@@ -131,7 +131,7 @@ class GlobalControllerAdviceTest {
         CreateUserRequest rq=TestUtilUser.buildCreateUserRequestMock();
         rq.setEmail("");
         webTestClient.post()
-                .uri("/users")
+                .uri("/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(rq))
                 .exchange()
@@ -149,7 +149,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new CredentialFailedException()));
 
         webTestClient.put()
-                .uri("/users/{id}/change-password", 1L)
+                .uri("/v1/users/{id}/change-password", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildChangePasswordRequestMock()))
                 .exchange()
@@ -169,7 +169,7 @@ class GlobalControllerAdviceTest {
         when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new PasswordNotConfirmException()));
 
         webTestClient.put()
-                .uri("/users/{id}/change-password", 1L)
+                .uri("/v1/users/{id}/change-password", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(rq))
                 .exchange()
