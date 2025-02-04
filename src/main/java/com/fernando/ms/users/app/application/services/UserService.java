@@ -4,7 +4,7 @@ import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
-import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
+import com.fernando.ms.users.app.infrastructure.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

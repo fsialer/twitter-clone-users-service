@@ -17,7 +17,7 @@ import java.util.Collections;
 
 import static com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.enums.ErrorType.FUNCTIONAL;
 import static com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.enums.ErrorType.SYSTEM;
-import static com.fernando.ms.users.app.infrastructure.adapter.utils.ErrorCatalog.*;
+import static com.fernando.ms.users.app.infrastructure.utils.ErrorCatalog.*;
 
 @Slf4j
 @RestControllerAdvice

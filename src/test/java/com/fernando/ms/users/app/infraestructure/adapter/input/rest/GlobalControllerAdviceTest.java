@@ -9,7 +9,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRe
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.utils.ErrorCatalog;
+import com.fernando.ms.users.app.infrastructure.utils.ErrorCatalog;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

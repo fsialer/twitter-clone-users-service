@@ -1,4 +1,4 @@
-package com.fernando.ms.users.app.infrastructure.adapter.utils;
+package com.fernando.ms.users.app.infrastructure.utils;
 
 public interface PasswordUtils {
     String generateSalt() ;

@@ -3,7 +3,7 @@ package com.fernando.ms.users.app.application.services;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
-import com.fernando.ms.users.app.infrastructure.adapter.utils.PasswordUtils;
+import com.fernando.ms.users.app.infrastructure.utils.PasswordUtils;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

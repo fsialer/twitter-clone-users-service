@@ -1,4 +1,4 @@
-package com.fernando.ms.users.app.infrastructure.adapter.utils;
+package com.fernando.ms.users.app.infrastructure.utils;
 
 import org.springframework.stereotype.Component;
 

@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 public class UserRestAdapter{
     private final UserInputPort userInputPort;
     private final UserRestMapper userRestMapper;
