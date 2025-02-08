@@ -46,6 +46,15 @@ public class UserRestAdapter{
                 });
     }
 
+    @PostMapping("/admin")
+    public Mono<ResponseEntity<UserResponse>> saveAdmin(@Valid @RequestBody CreateUserRequest rq){
+        return userInputPort.save(userRestMapper.toUser(rq))
+                .flatMap(user -> {
+                    String location = "/users/admin/".concat(user.getId().toString());
+                    return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
+                });
+    }
+
     @PutMapping("/{id}")
     public Mono<ResponseEntity<UserResponse>> update(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest rq){
         return userInputPort.update(id,userRestMapper.toUser(rq))

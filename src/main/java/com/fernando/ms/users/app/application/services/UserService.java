@@ -41,6 +41,28 @@ public class UserService implements UserInputPort {
                     String salt= passwordUtils.generateSalt();
                     user.setPasswordHash(passwordUtils.hashPassword(user.getPassword(),salt));
                     user.setPasswordSalt(salt);
+                    user.setAdmin(false);
+                    return userPersistencePort.save(user);
+                });
+    }
+
+    @Override
+    public Mono<User> saveAdmin(User user) {
+        return userPersistencePort.existsByUsername(user.getUsername())
+                .flatMap(existByUsername->{
+                    if(Boolean.TRUE.equals(existByUsername)){
+                        return Mono.error(new UserUsernameAlreadyExistsException(user.getUsername()));
+                    }
+                    return userPersistencePort.existsByEmail(user.getEmail());
+                })
+                .flatMap(existByEmail->{
+                    if(Boolean.TRUE.equals(existByEmail)){
+                        return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
+                    }
+                    String salt= passwordUtils.generateSalt();
+                    user.setPasswordHash(passwordUtils.hashPassword(user.getPassword(),salt));
+                    user.setPasswordSalt(salt);
+                    user.setAdmin(true);
                     return userPersistencePort.save(user);
                 });
     }

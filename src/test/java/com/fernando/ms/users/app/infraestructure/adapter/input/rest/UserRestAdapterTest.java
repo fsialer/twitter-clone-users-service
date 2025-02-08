@@ -99,6 +99,30 @@ class UserRestAdapterTest {
     }
 
     @Test
+    @DisplayName("When User Admin Information Is Correct Expect User Admin Information Saved Successfully")
+    void When_UserAdminInformationIsCorrect_Expect_UserAdminInformationSavedSuccessfully() throws JsonProcessingException {
+        User userAdmin=TestUtilUser.buildUserMock();
+        userAdmin.setAdmin(true);
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(userAdmin);
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(userAdmin));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
+
+        webTestClient.post()
+                .uri("/v1/users/admin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildCreateUserRequestMock()))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userInputPort, times(1)).save(any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
+    }
+
+    @Test
     @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() throws JsonProcessingException {
         when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn( TestUtilUser.buildUserMock());

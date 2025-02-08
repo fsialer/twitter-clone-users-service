@@ -20,6 +20,7 @@ public class TestUtilUser {
                 .names("Fernando Sialer")
                 .email("asialer05@hotmail.com")
                 .password("123456")
+                .admin(false)
                 .build();
     }
 
@@ -31,6 +32,7 @@ public class TestUtilUser {
                 .email("asialer05@hotmail.com")
                 .passwordHash("123456")
                 .passwordSalt("123456")
+                .admin(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
