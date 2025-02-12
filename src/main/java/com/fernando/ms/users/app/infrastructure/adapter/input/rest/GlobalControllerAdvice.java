@@ -75,13 +75,12 @@ public class GlobalControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CredentialFailedException.class)
-    public  Mono<ErrorResponse> handleCredentialFailedException(CredentialFailedException e) {
+    public  Mono<ErrorResponse> handleCredentialFailedException() {
         return Mono.just(ErrorResponse.builder()
                 .code(USER_CREDENTIAL_FAIL.getCode())
                 .type(FUNCTIONAL)
                 .message(USER_CREDENTIAL_FAIL.getMessage())
                 .timestamp(LocalDate.now().toString())
-                //.details(Collections.singletonList(e.getMessage()))
                 .build());
     }
 
@@ -93,7 +92,6 @@ public class GlobalControllerAdvice {
                 .type(FUNCTIONAL)
                 .message(USER_PASSWORD_NO_CONFIRM.getMessage())
                 .timestamp(LocalDate.now().toString())
-                //.details(Collections.singletonList(e.getMessage()))
                 .build());
     }
 

@@ -48,7 +48,7 @@ public class UserRestAdapter{
 
     @PostMapping("/admin")
     public Mono<ResponseEntity<UserResponse>> saveAdmin(@Valid @RequestBody CreateUserRequest rq){
-        return userInputPort.save(userRestMapper.toUser(rq))
+        return userInputPort.saveAdmin(userRestMapper.toUser(rq))
                 .flatMap(user -> {
                     String location = "/users/admin/".concat(user.getId().toString());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));

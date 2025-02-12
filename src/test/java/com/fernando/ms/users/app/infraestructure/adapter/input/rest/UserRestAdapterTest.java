@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-@WebFluxTest(UserRestAdapter.class)
+@WebFluxTest({UserRestAdapter.class})
 class UserRestAdapterTest {
     @Autowired
     private WebTestClient webTestClient;
@@ -41,6 +41,7 @@ class UserRestAdapterTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
 
     @Test
     @DisplayName("When Users Are Exists Expect Users Information Return Successfully")
