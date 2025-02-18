@@ -1,5 +1,7 @@
 package com.fernando.ms.users.app.utils;
 
+import com.fernando.ms.users.app.domain.models.Admin;
+import com.fernando.ms.users.app.domain.models.Author;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
@@ -14,14 +16,15 @@ import java.time.LocalDateTime;
 public class TestUtilUser {
 
     public static User buildUserMock(){
-        return User.builder()
-                .id(1L)
-                .username("falex")
-                .names("Fernando Sialer")
-                .email("asialer05@hotmail.com")
-                .password("123456")
-                .admin(false)
-                .build();
+        return new User(1L,"falex","Fernando","asialer05@hotmail.com",false,"123456",null,null,null,null);
+    }
+
+    public static Admin buildAdminMock(){
+        return new Admin("falex","Fernando","asialer05@hotmail.com","123456");
+    }
+
+    public static Author buildAuthorMock(){
+        return new Author("falex","Fernando","asialer05@hotmail.com","123456");
     }
 
     public static UserEntity buildUserEntityMock(){

@@ -76,8 +76,8 @@ class UserServiceTest {
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() {
         when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
-        when(passwordUtils.generateSalt()).thenReturn("salt");
-        when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
+        //when(passwordUtils.generateSalt()).thenReturn("salt");
+       // when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
         when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
 
         Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
@@ -88,8 +88,8 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
         Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
-        Mockito.verify(passwordUtils,times(1)).generateSalt();
-        Mockito.verify(passwordUtils,times(1)).hashPassword(anyString(), anyString());
+       // Mockito.verify(passwordUtils,times(1)).generateSalt();
+       // Mockito.verify(passwordUtils,times(1)).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort,times(1)).save(any(User.class));
     }
 
@@ -378,29 +378,5 @@ class UserServiceTest {
                 .verifyComplete();
 
         Mockito.verify(userPersistencePort, times(1)).findByIds(anyIterable());
-    }
-
-    @Test
-    @DisplayName("When User Admin Information Is Correct Expect User Admin Information Saved Successfully")
-    void When_UserAdminInformationIsCorrect_Expect_UserAdminInformationSavedSuccessfully() {
-        User userAdmin=TestUtilUser.buildUserMock();
-        userAdmin.setAdmin(true);
-        when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
-        when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
-        when(passwordUtils.generateSalt()).thenReturn("salt");
-        when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
-        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(userAdmin));
-
-        Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
-
-        StepVerifier.create(savedUser)
-                .expectNext(TestUtilUser.buildUserMock())
-                .verifyComplete();
-
-        Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
-        Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
-        Mockito.verify(passwordUtils,times(1)).generateSalt();
-        Mockito.verify(passwordUtils,times(1)).hashPassword(anyString(), anyString());
-        Mockito.verify(userPersistencePort,times(1)).save(any(User.class));
     }
 }

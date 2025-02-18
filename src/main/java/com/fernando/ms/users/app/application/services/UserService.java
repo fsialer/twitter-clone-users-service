@@ -2,6 +2,7 @@ package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
+import com.fernando.ms.users.app.application.services.proxy.ProcessUserProxy;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.utils.PasswordUtils;
@@ -27,47 +28,9 @@ public class UserService implements UserInputPort {
 
     @Override
     public Mono<User> save(User user) {
-        return userPersistencePort.existsByUsername(user.getUsername())
-                .flatMap(existByUsername->{
-                    if(Boolean.TRUE.equals(existByUsername)){
-                        return Mono.error(new UserUsernameAlreadyExistsException(user.getUsername()));
-                    }
-                    return userPersistencePort.existsByEmail(user.getEmail());
-                })
-                .flatMap(existByEmail->{
-                    if(Boolean.TRUE.equals(existByEmail)){
-                        return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
-                    }
-                    String salt= passwordUtils.generateSalt();
-                    user.setPasswordHash(passwordUtils.hashPassword(user.getPassword(),salt));
-                    user.setPasswordSalt(salt);
-                    user.setAdmin(false);
-                    return userPersistencePort.save(user);
-                });
+        ProcessUserProxy processUserProxy=new ProcessUserProxy(userPersistencePort);
+        return processUserProxy.doProcess(user).flatMap(userPersistencePort::save);
     }
-
-
-    @Override
-    public Mono<User> saveAdmin(User user) {
-        return userPersistencePort.existsByUsername(user.getUsername())
-                .flatMap(existByUsername->{
-                    if(Boolean.TRUE.equals(existByUsername)){
-                        return Mono.error(new UserUsernameAlreadyExistsException(user.getUsername()));
-                    }
-                    return userPersistencePort.existsByEmail(user.getEmail());
-                })
-                .flatMap(existByEmail->{
-                    if(Boolean.TRUE.equals(existByEmail)){
-                        return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
-                    }
-                    String salt= passwordUtils.generateSalt();
-                    user.setPasswordHash(passwordUtils.hashPassword(user.getPassword(),salt));
-                    user.setPasswordSalt(salt);
-                    user.setAdmin(true);
-                    return userPersistencePort.save(user);
-                });
-    }
-
 
     @Override
     public Mono<User> update(Long id, User user) {

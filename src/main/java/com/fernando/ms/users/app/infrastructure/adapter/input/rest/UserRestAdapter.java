@@ -39,7 +39,7 @@ public class UserRestAdapter{
 
     @PostMapping
     public Mono<ResponseEntity<UserResponse>> save(@Valid @RequestBody CreateUserRequest rq){
-        return userInputPort.save(userRestMapper.toUser(rq))
+        return userInputPort.save(userRestMapper.toAuthor(rq))
                 .flatMap(user -> {
                     String location = "/users/".concat(user.getId().toString());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
@@ -48,7 +48,7 @@ public class UserRestAdapter{
 
     @PostMapping("/admin")
     public Mono<ResponseEntity<UserResponse>> saveAdmin(@Valid @RequestBody CreateUserRequest rq){
-        return userInputPort.saveAdmin(userRestMapper.toUser(rq))
+        return userInputPort.save(userRestMapper.toAdmin(rq))
                 .flatMap(user -> {
                     String location = "/users/admin/".concat(user.getId().toString());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
@@ -58,9 +58,7 @@ public class UserRestAdapter{
     @PutMapping("/{id}")
     public Mono<ResponseEntity<UserResponse>> update(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest rq){
         return userInputPort.update(id,userRestMapper.toUser(rq))
-                .flatMap(user->{
-                   return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
-                });
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 
     @DeleteMapping("/{id}")
@@ -95,8 +93,6 @@ public class UserRestAdapter{
     @GetMapping("/{username}/username")
     public Mono<ResponseEntity<UserResponse>> findByUsername(@PathVariable("username") String username){
         return userInputPort.findByUsername(username)
-                .flatMap(user->{
-                    return Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user)));
-                });
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 }

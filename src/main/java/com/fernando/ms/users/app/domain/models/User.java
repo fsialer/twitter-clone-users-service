@@ -8,7 +8,6 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class User {
     private Long id;
     private String username;
@@ -21,6 +20,14 @@ public class User {
     private String passwordHash;
     private String passwordSalt;
 
+    public User(String username,String names,String email, String password,Boolean admin){
+        this.username=username;
+        this.names=names;
+        this.email=email;
+        this.password=password;
+        this.admin=admin;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -32,4 +39,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, username,email);
     }
+
 }

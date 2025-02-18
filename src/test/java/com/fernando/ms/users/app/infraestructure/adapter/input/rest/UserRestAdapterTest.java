@@ -3,6 +3,8 @@ package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
+import com.fernando.ms.users.app.domain.models.Admin;
+import com.fernando.ms.users.app.domain.models.Author;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
@@ -80,8 +82,10 @@ class UserRestAdapterTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() throws JsonProcessingException {
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(TestUtilUser.buildUserMock());
-        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        Author author=TestUtilUser.buildAuthorMock();
+        User user=TestUtilUser.buildUserMock();
+        when(userRestMapper.toAuthor(any(CreateUserRequest.class))).thenReturn(author);
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
@@ -94,7 +98,7 @@ class UserRestAdapterTest {
                 .jsonPath("$.names").isEqualTo("Fernando Sialer")
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
-        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userRestMapper, times(1)).toAuthor(any(CreateUserRequest.class));
         Mockito.verify(userInputPort, times(1)).save(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
@@ -102,10 +106,10 @@ class UserRestAdapterTest {
     @Test
     @DisplayName("When User Admin Information Is Correct Expect User Admin Information Saved Successfully")
     void When_UserAdminInformationIsCorrect_Expect_UserAdminInformationSavedSuccessfully() throws JsonProcessingException {
-        User userAdmin=TestUtilUser.buildUserMock();
-        userAdmin.setAdmin(true);
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(userAdmin);
-        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(userAdmin));
+        Admin admin=TestUtilUser.buildAdminMock();
+        User user=TestUtilUser.buildUserMock();
+        when(userRestMapper.toAdmin(any(CreateUserRequest.class))).thenReturn(admin);
+        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.post()
@@ -118,7 +122,7 @@ class UserRestAdapterTest {
                 .jsonPath("$.names").isEqualTo("Fernando Sialer")
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
-        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userRestMapper, times(1)).toAdmin(any(CreateUserRequest.class));
         Mockito.verify(userInputPort, times(1)).save(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }

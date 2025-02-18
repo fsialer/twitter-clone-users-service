@@ -1,5 +1,7 @@
 package com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper;
 
+import com.fernando.ms.users.app.domain.models.Admin;
+import com.fernando.ms.users.app.domain.models.Author;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
@@ -27,6 +29,14 @@ public interface UserRestMapper {
 
     User toUser(CreateUserRequest rq);
     User toUser(UpdateUserRequest rq);
+
+    default Admin toAdmin(CreateUserRequest rq){
+        return new Admin(rq.getUsername(), rq.getNames(),rq.getEmail(),rq.getPassword());
+    }
+
+    default Author toAuthor(CreateUserRequest rq){
+        return new Author(rq.getUsername(), rq.getNames(),rq.getEmail(),rq.getPassword());
+    }
 
     User toUser(ChangePasswordRequest rq);
 
