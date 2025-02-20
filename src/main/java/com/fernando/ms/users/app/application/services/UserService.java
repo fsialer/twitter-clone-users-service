@@ -2,10 +2,12 @@ package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
-import com.fernando.ms.users.app.application.services.proxy.ProcessUserProxy;
+import com.fernando.ms.users.app.application.services.proxy.authentication.RuleAuthenticationProxy;
+import com.fernando.ms.users.app.application.services.proxy.change.RuleChangePasswordUserProxy;
+import com.fernando.ms.users.app.application.services.proxy.save.RuleSaveUserProxy;
+import com.fernando.ms.users.app.application.services.proxy.update.RuleUpdateUserProxy;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
-import com.fernando.ms.users.app.infrastructure.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,7 +17,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserService implements UserInputPort {
     private final UserPersistencePort userPersistencePort;
-    private final PasswordUtils passwordUtils;
+
     @Override
     public Flux<User> findAll() {
         return userPersistencePort.findAll();
@@ -28,28 +30,14 @@ public class UserService implements UserInputPort {
 
     @Override
     public Mono<User> save(User user) {
-        ProcessUserProxy processUserProxy=new ProcessUserProxy(userPersistencePort);
-        return processUserProxy.doProcess(user).flatMap(userPersistencePort::save);
+        RuleSaveUserProxy ruleSaveUserProxy =new RuleSaveUserProxy(userPersistencePort);
+        return ruleSaveUserProxy.doProcess(user).flatMap(userPersistencePort::save);
     }
 
     @Override
     public Mono<User> update(Long id, User user) {
-        return userPersistencePort.finById(id)
-                .switchIfEmpty(Mono.error(UserNotFoundException::new))
-                .flatMap(userInfo->{
-                    userInfo.setNames(user.getNames());
-                    if(!userInfo.getEmail().equals(user.getEmail())){
-                        return userPersistencePort.existsByEmail(user.getEmail())
-                                .flatMap(existsEmail->{
-                                    if(Boolean.TRUE.equals(existsEmail)){
-                                        return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
-                                    }
-                                    userInfo.setEmail(user.getEmail());
-                                   return userPersistencePort.save(userInfo);
-                                });
-                    }
-                    return userPersistencePort.save(userInfo);
-                });
+        RuleUpdateUserProxy ruleUpdateUserProxy=new RuleUpdateUserProxy(userPersistencePort,id);
+        return ruleUpdateUserProxy.doProcess(user).flatMap(userPersistencePort::save);
     }
 
     @Override
@@ -61,33 +49,14 @@ public class UserService implements UserInputPort {
 
     @Override
     public Mono<User> changePassword(Long id, User user) {
-        return userPersistencePort.finById(id)
-                .switchIfEmpty(Mono.error(UserNotFoundException::new))
-                .flatMap(userInfo->{
-
-                    if(!passwordUtils.validatePassword(user.getPassword(),userInfo.getPasswordSalt(),userInfo.getPasswordHash())){
-                        return Mono.error(CredentialFailedException::new);
-                    }
-                    if(!user.getNewPassword().equals(user.getConfirmPassword())){
-                        return Mono.error(PasswordNotConfirmException::new);
-                    }
-                    String salt= passwordUtils.generateSalt();
-                    userInfo.setPasswordHash(passwordUtils.hashPassword(user.getNewPassword(),salt));
-                    userInfo.setPasswordSalt(salt);
-                    return userPersistencePort.save(userInfo);
-                });
+        RuleChangePasswordUserProxy ruleChangePasswordUserProxy =new RuleChangePasswordUserProxy(userPersistencePort,id);
+        return ruleChangePasswordUserProxy.doProcess(user).flatMap(userPersistencePort::save);
     }
 
     @Override
     public Mono<User> authentication(User user) {
-        return userPersistencePort.findByUsername(user.getUsername())
-                .switchIfEmpty(Mono.error(UserNotFoundException::new))
-                .flatMap(userInfo->{
-                    if(!passwordUtils.validatePassword(user.getPassword(),userInfo.getPasswordSalt(),userInfo.getPasswordHash())){
-                        return Mono.error(CredentialFailedException::new);
-                    }
-                    return Mono.just(userInfo);
-                });
+        RuleAuthenticationProxy ruleAuthenticationProxy=new RuleAuthenticationProxy(userPersistencePort);
+        return ruleAuthenticationProxy.doProcess(user);
     }
 
     @Override

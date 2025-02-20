@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class TestUtilUser {
 
     public static User buildUserMock(){
-        return new User(1L,"falex","Fernando","asialer05@hotmail.com",false,"123456",null,null,null,null);
+        return new User(1L,"falex","Fernando","asialer05@hotmail.com",false,"123456","1234567","1234567","eeA705vb8zitg5k6WoUJ2hX1Bw3e+gkeQq4IYprPOqo=","EelI4aFBvAnuxD67e2DmtQ==");
     }
 
     public static Admin buildAdminMock(){

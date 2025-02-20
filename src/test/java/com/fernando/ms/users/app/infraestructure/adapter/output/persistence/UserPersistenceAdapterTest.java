@@ -74,7 +74,6 @@ class UserPersistenceAdapterTest {
         StepVerifier.create(savedUser)
                 .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
-
         Mockito.verify(userReactiveRepository,times(1)).save(any(UserEntity.class));
         Mockito.verify(userPersistenceMapper,times(1)).toUserEntity(any(User.class));
         Mockito.verify(userPersistenceMapper,times(1)).toUser(any(Mono.class));
@@ -83,15 +82,11 @@ class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When Email User Exists Expect Return True")
     void When_EmailUserExists_Expect_Return_True() {
-
         when(userReactiveRepository.existsByEmailIgnoreCase(anyString())).thenReturn(Mono.just(true));
-
         Mono<Boolean> exists = userPersistenceAdapter.existsByEmail("test@example.com");
-
         StepVerifier.create(exists)
                 .expectNext(true)
                 .verifyComplete();
-
         Mockito.verify(userReactiveRepository,times(1)).existsByEmailIgnoreCase(anyString());
     }
 
@@ -99,13 +94,10 @@ class UserPersistenceAdapterTest {
     @DisplayName("When Username User Exists Expect Return True")
     void When_UsernameUserExists_Expect_Return_True() {
         when(userReactiveRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(Mono.just(true));
-
         Mono<Boolean> exists = userPersistenceAdapter.existsByUsername("testuser");
-
         StepVerifier.create(exists)
                 .expectNext(true)
                 .verifyComplete();
-
         Mockito.verify(userReactiveRepository,times(1)).existsByUsernameIgnoreCase(anyString());
     }
 
@@ -124,13 +116,10 @@ class UserPersistenceAdapterTest {
     void When_UsernameIsCorrect_Expect_UserInformationCorrect() {
         when(userReactiveRepository.findByUsername(anyString())).thenReturn(Mono.just( TestUtilUser.buildUserEntityMock()));
         when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
-
         Mono<User> result = userPersistenceAdapter.findByUsername("testuser");
-
         StepVerifier.create(result)
                 .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
-
         Mockito.verify(userReactiveRepository, times(1)).findByUsername(anyString());
         Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
     }

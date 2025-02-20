@@ -16,12 +16,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -76,8 +76,6 @@ class UserServiceTest {
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() {
         when(userPersistencePort.existsByUsername(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
-        //when(passwordUtils.generateSalt()).thenReturn("salt");
-       // when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("hashedPassword");
         when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
 
         Mono<User> savedUser = userService.save(TestUtilUser.buildUserMock());
@@ -88,8 +86,6 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
         Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
-       // Mockito.verify(passwordUtils,times(1)).generateSalt();
-       // Mockito.verify(passwordUtils,times(1)).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort,times(1)).save(any(User.class));
     }
 
@@ -106,8 +102,6 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).existsByEmail(anyString());
-        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
-        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
@@ -125,8 +119,6 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort,times(1)).existsByUsername(anyString());
         Mockito.verify(userPersistencePort,times(1)).existsByEmail(anyString());
-        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
-        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
@@ -206,14 +198,11 @@ class UserServiceTest {
     @DisplayName("When Password Is Correct Expect Password Changed Successfully")
     void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() {
         User updatedUser = TestUtilUser.buildUserMock();
-        updatedUser.setPassword("newPassword");
-        updatedUser.setNewPassword("newPassword");
-        updatedUser.setConfirmPassword("newPassword");
+        updatedUser.setPassword("123456");
+        updatedUser.setNewPassword("1234567");
+        updatedUser.setConfirmPassword("1234567");
 
         when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
-        when(passwordUtils.generateSalt()).thenReturn("newSalt");
-        when(passwordUtils.hashPassword(anyString(), anyString())).thenReturn("newHashedPassword");
         when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
 
         Mono<User> result = userService.changePassword(1L, updatedUser);
@@ -223,9 +212,6 @@ class UserServiceTest {
                 .verifyComplete();
 
         Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
-        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
-        Mockito.verify(passwordUtils, times(1)).generateSalt();
-        Mockito.verify(passwordUtils, times(1)).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
     }
 
@@ -233,13 +219,9 @@ class UserServiceTest {
     @DisplayName("Expect CredentialFailedException When Password Validation Fails")
     void Expect_CredentialFailedException_When_PasswordValidationFails() {
         User updatedUser = TestUtilUser.buildUserMock();
-        updatedUser.setPassword("newPassword");
+        updatedUser.setPassword("wrongPassword");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-
-        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class)))
-                .thenReturn(false);
-
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(updatedUser));
         Mono<User> result = userService.changePassword(1L, updatedUser);
 
         StepVerifier.create(result)
@@ -247,9 +229,6 @@ class UserServiceTest {
                 .verify();
 
         Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
-        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
-        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
-        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
@@ -257,12 +236,11 @@ class UserServiceTest {
     @DisplayName("Expect PasswordNotConfirmException When New Passwords Do Not Match")
     void Expect_PasswordNotConfirmException_When_NewPasswordsDoNotMatch() {
         User updatedUser = TestUtilUser.buildUserMock();
-        updatedUser.setPassword("oldPassword");
+        updatedUser.setPassword("123456");
         updatedUser.setNewPassword("newPassword");
         updatedUser.setConfirmPassword("differentPassword");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-        when(passwordUtils.validatePassword(anyString(), nullable(String.class), nullable(String.class))).thenReturn(true);
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(updatedUser));
 
         Mono<User> result = userService.changePassword(1L, updatedUser);
 
@@ -271,9 +249,6 @@ class UserServiceTest {
                 .verify();
 
         Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
-        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), nullable(String.class), nullable(String.class));
-        Mockito.verify(passwordUtils, Mockito.never()).generateSalt();
-        Mockito.verify(passwordUtils, Mockito.never()).hashPassword(anyString(), anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
 
@@ -281,12 +256,8 @@ class UserServiceTest {
     @DisplayName("When Authentication Is Successful Expect User Returned")
     void When_AuthenticationIsSuccessful_Expect_UserReturned() {
         User userInfo = TestUtilUser.buildUserMock();
-        userInfo.setPasswordSalt("salt");
-        userInfo.setPasswordHash("hashedPassword");
 
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
-        when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(true);
-
         Mono<User> result = userService.authentication( TestUtilUser.buildUserMock());
 
         StepVerifier.create(result)
@@ -294,7 +265,6 @@ class UserServiceTest {
                 .verifyComplete();
 
         Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
-        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -305,7 +275,6 @@ class UserServiceTest {
         userInfo.setPasswordHash("hashedPassword");
 
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
-        when(passwordUtils.validatePassword(anyString(), anyString(), anyString())).thenReturn(false);
 
         Mono<User> result = userService.authentication( TestUtilUser.buildUserMock());
 
@@ -314,7 +283,6 @@ class UserServiceTest {
                 .verify();
 
         Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
-        Mockito.verify(passwordUtils, times(1)).validatePassword(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -329,7 +297,6 @@ class UserServiceTest {
                 .verify();
 
         Mockito.verify(userPersistencePort, times(1)).findByUsername(anyString());
-        Mockito.verify(passwordUtils, Mockito.never()).validatePassword(anyString(), anyString(), anyString());
     }
 
     @Test
