@@ -20,6 +20,7 @@ public class UserEntity {
     private String names;
     private String email;
     private Boolean admin;
+    private String password;
     private String passwordHash;
     private String passwordSalt;
     private LocalDateTime createdAt;
