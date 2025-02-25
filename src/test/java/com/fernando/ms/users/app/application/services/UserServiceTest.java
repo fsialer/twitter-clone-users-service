@@ -1,6 +1,8 @@
 package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
+import com.fernando.ms.users.app.application.services.proxy.IProcessUser;
+import com.fernando.ms.users.app.application.services.proxy.ProcessFactory;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.utils.PasswordUtils;
@@ -16,7 +18,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -147,9 +148,12 @@ class UserServiceTest {
     @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
     void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() {
         User updatedUser = TestUtilUser.buildUserMock();
-        updatedUser.setEmail("newemail@example.com");
+        updatedUser.setEmail("newemail@hotmail.com");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        User existingUser = TestUtilUser.buildUserMock();
+        existingUser.setEmail("existingemail@example.com");
+
+        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just( existingUser));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
 
         Mono<User> result = userService.update(1L, updatedUser);
@@ -273,8 +277,9 @@ class UserServiceTest {
         User userInfo = TestUtilUser.buildUserMock();
         userInfo.setPasswordSalt("salt");
         userInfo.setPasswordHash("hashedPassword");
-
         when(userPersistencePort.findByUsername(anyString())).thenReturn(Mono.just(userInfo));
+        IProcessUser iProcessUser = ProcessFactory.validateAuthentication(userPersistencePort);
+        when(iProcessUser.doProcess(userInfo)).thenReturn(Mono.error(new CredentialFailedException()));
 
         Mono<User> result = userService.authentication( TestUtilUser.buildUserMock());
 
