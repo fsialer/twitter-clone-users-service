@@ -6,7 +6,6 @@ import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.GlobalControllerAdvice;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ErrorResponse;
 import com.fernando.ms.users.app.infrastructure.utils.ErrorCatalog;
@@ -81,28 +80,6 @@ class GlobalControllerAdviceTest {
                 });
     }
 
-
-    @Test
-    @DisplayName("Expect UserUsernameAlreadyExistsException When Username Already Exists")
-    void Expect_UserUsernameAlreadyExistsException_When_UsernameAlreadyExists() throws JsonProcessingException {
-        CreateUserRequest createUserRequest = TestUtilUser.buildCreateUserRequestMock();
-        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(TestUtilUser.buildUserMock());
-        when(userRestAdapter.save(any())).thenReturn(Mono.error(new UserUsernameAlreadyExistsException(createUserRequest.getUsername())));
-
-        webTestClient.post()
-                .uri("/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(createUserRequest)) // Replace with actual request body
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ErrorResponse.class)
-                .value(response -> {
-                    assert response.getCode().equals(ErrorCatalog.USER_USERNAME_ALREADY_EXISTS.getCode());
-                    assert response.getMessage().equals(ErrorCatalog.USER_USERNAME_ALREADY_EXISTS.getMessage());
-                    assert response.getDetails().contains("User username: " + createUserRequest.getUsername() + " already exists!");
-                });
-    }
-
     @Test
     @DisplayName("Expect UserEmailAlreadyExistsException When Email Already Exists")
     void Expect_UserEmailAlreadyExistsException_When_EmailAlreadyExists() throws JsonProcessingException {
@@ -143,41 +120,4 @@ class GlobalControllerAdviceTest {
                 });
     }
 
-    @Test
-    @DisplayName("Expect CredentialFailedException When Credentials Fail")
-    void Expect_CredentialFailedException_When_CredentialsFail() throws JsonProcessingException {
-        when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new CredentialFailedException()));
-
-        webTestClient.put()
-                .uri("/v1/users/{id}/change-password", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildChangePasswordRequestMock()))
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ErrorResponse.class)
-                .value(response -> {
-                    assert response.getCode().equals(ErrorCatalog.USER_CREDENTIAL_FAIL.getCode());
-                    assert response.getMessage().equals(ErrorCatalog.USER_CREDENTIAL_FAIL.getMessage());
-                });
-    }
-
-    @Test
-    @DisplayName("Expect PasswordNotConfirmException When Passwords Do Not Match")
-    void Expect_PasswordNotConfirmException_When_PasswordsDoNotMatch() throws JsonProcessingException {
-        ChangePasswordRequest rq= TestUtilUser.buildChangePasswordRequestMock();
-        rq.setConfirmPassword("124");
-        when(userRestAdapter.changePassword(anyLong(), any())).thenReturn(Mono.error(new PasswordNotConfirmException()));
-
-        webTestClient.put()
-                .uri("/v1/users/{id}/change-password", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(rq))
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ErrorResponse.class)
-                .value(response -> {
-                    assert response.getCode().equals(ErrorCatalog.USER_PASSWORD_NO_CONFIRM.getCode());
-                    assert response.getMessage().equals(ErrorCatalog.USER_PASSWORD_NO_CONFIRM.getMessage());
-                });
-    }
 }

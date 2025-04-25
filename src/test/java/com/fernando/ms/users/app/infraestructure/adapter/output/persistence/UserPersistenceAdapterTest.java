@@ -91,17 +91,6 @@ class UserPersistenceAdapterTest {
     }
 
     @Test
-    @DisplayName("When Username User Exists Expect Return True")
-    void When_UsernameUserExists_Expect_Return_True() {
-        when(userReactiveRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(Mono.just(true));
-        Mono<Boolean> exists = userPersistenceAdapter.existsByUsername("testuser");
-        StepVerifier.create(exists)
-                .expectNext(true)
-                .verifyComplete();
-        Mockito.verify(userReactiveRepository,times(1)).existsByUsernameIgnoreCase(anyString());
-    }
-
-    @Test
     @DisplayName("When User Exists Expect User Deleted Successfully")
     void When_UserExists_Expect_UserDeletedSuccessfully() {
         when(userReactiveRepository.deleteById(anyLong())).thenReturn(Mono.empty());
@@ -109,19 +98,6 @@ class UserPersistenceAdapterTest {
         StepVerifier.create(result)
                 .verifyComplete();
         Mockito.verify(userReactiveRepository, times(1)).deleteById(anyLong());
-    }
-
-    @Test
-    @DisplayName("When Username Is Correct Expect User Information Correct")
-    void When_UsernameIsCorrect_Expect_UserInformationCorrect() {
-        when(userReactiveRepository.findByUsername(anyString())).thenReturn(Mono.just( TestUtilUser.buildUserEntityMock()));
-        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
-        Mono<User> result = userPersistenceAdapter.findByUsername("testuser");
-        StepVerifier.create(result)
-                .expectNext(TestUtilUser.buildUserMock())
-                .verifyComplete();
-        Mockito.verify(userReactiveRepository, times(1)).findByUsername(anyString());
-        Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
     }
 
     @Test

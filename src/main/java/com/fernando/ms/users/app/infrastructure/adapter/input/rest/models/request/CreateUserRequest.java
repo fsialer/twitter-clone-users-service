@@ -10,13 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class CreateUserRequest {
-    @NotBlank(message = "Field username cannot be null or blank")
-    private String username;
     @NotBlank(message = "Field names cannot be null or blank")
     private String names;
     @NotBlank(message = "Field email cannot be null or blank")
     @Email(message="Field email must be a valid")
     private String email;
-    @NotBlank(message = "Field password cannot be null or blank")
-    private String password;
 }

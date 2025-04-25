@@ -2,8 +2,6 @@ package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
-import com.fernando.ms.users.app.application.services.proxy.ProcessFactory;
-import com.fernando.ms.users.app.application.services.proxy.IProcessUser;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +26,35 @@ public class UserService implements UserInputPort {
 
     @Override
     public Mono<User> save(User user) {
-        IProcessUser iProcessUser = ProcessFactory.validateSave(userPersistencePort);
-        return iProcessUser.doProcess(user).flatMap(userPersistencePort::save);
+        return userPersistencePort.existsByEmail(user.getEmail())
+                            .flatMap(existByEmail-> {
+                                        if (Boolean.TRUE.equals(existByEmail)) {
+                                            return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
+                                        }
+                                        return userPersistencePort.save(user);
+                                    }
+                            );
     }
 
     @Override
     public Mono<User> update(Long id, User user) {
-        IProcessUser iProcessUser = ProcessFactory.validateUpdate(userPersistencePort,id);
-        return iProcessUser.doProcess(user).flatMap(userPersistencePort::save);
+       return userPersistencePort.finById(id)
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(userInfo->{
+                    userInfo.setNames(user.getNames());
+                    return Mono.just(userInfo)
+                            .filter(user1 -> !user1.getEmail().equals(user.getEmail()))
+                            .flatMap(user1-> userPersistencePort.existsByEmail(user.getEmail())
+                                    .flatMap(existByEmail-> {
+                                        if (Boolean.TRUE.equals(existByEmail)) {
+                                            return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
+                                        }
+                                        user1.setEmail(user.getEmail());
+                                        return userPersistencePort.save(user1);
+                                    })
+                            )
+                            .defaultIfEmpty(userInfo);
+                });
     }
 
     @Override
@@ -46,18 +65,6 @@ public class UserService implements UserInputPort {
     }
 
     @Override
-    public Mono<User> changePassword(Long id, User user) {
-        IProcessUser iProcessUser = ProcessFactory.validateChangePassword(userPersistencePort,id);
-        return iProcessUser.doProcess(user).flatMap(userPersistencePort::save);
-    }
-
-    @Override
-    public Mono<User> authentication(User user) {
-        IProcessUser iProcessUser = ProcessFactory.validateAuthentication(userPersistencePort);
-        return iProcessUser.doProcess(user);
-    }
-
-    @Override
     public Mono<Boolean> verifyUser(Long id) {
         return userPersistencePort.verifyUser(id);
     }
@@ -65,11 +72,5 @@ public class UserService implements UserInputPort {
     @Override
     public Flux<User> findByIds(Iterable<Long> ids) {
         return userPersistencePort.findByIds(ids);
-    }
-
-    @Override
-    public Mono<User> findByUsername(String username) {
-        return userPersistencePort.findByUsername(username)
-                .switchIfEmpty(Mono.error(UserNotFoundException::new));
     }
 }

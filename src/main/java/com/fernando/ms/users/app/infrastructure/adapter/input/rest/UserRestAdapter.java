@@ -3,10 +3,8 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import jakarta.validation.Valid;
@@ -39,18 +37,9 @@ public class UserRestAdapter{
 
     @PostMapping
     public Mono<ResponseEntity<UserResponse>> save(@Valid @RequestBody CreateUserRequest rq){
-        return userInputPort.save(userRestMapper.toAuthor(rq))
+        return userInputPort.save(userRestMapper.toUser(rq))
                 .flatMap(user -> {
                     String location = "/users/".concat(user.getId().toString());
-                    return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
-                });
-    }
-
-    @PostMapping("/admin")
-    public Mono<ResponseEntity<UserResponse>> saveAdmin(@Valid @RequestBody CreateUserRequest rq){
-        return userInputPort.save(userRestMapper.toAdmin(rq))
-                .flatMap(user -> {
-                    String location = "/users/admin/".concat(user.getId().toString());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
                 });
     }
@@ -67,18 +56,6 @@ public class UserRestAdapter{
         return userInputPort.delete(id);
     }
 
-    @PutMapping("/{id}/change-password")
-    public Mono<ResponseEntity<UserResponse>> changePassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordRequest rq){
-        return userInputPort.changePassword(id,userRestMapper.toUser(rq))
-                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
-    }
-
-    @PostMapping("/auth")
-    public Mono<ResponseEntity<UserResponse>> authentication(@Valid @RequestBody UserAuthRequest rq){
-        return userInputPort.authentication(userRestMapper.toUser(rq))
-                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
-    }
-
     @GetMapping("/{id}/verify")
     public Mono<ResponseEntity<ExistsUserResponse>> verify(@PathVariable("id") Long id){
         return userInputPort.verifyUser(id)
@@ -88,11 +65,5 @@ public class UserRestAdapter{
     @GetMapping("/find-by-ids")
     public Flux<UserResponse> findByIds(@RequestParam("ids") List<Long> ids){
         return userRestMapper.toUsersResponse(userInputPort.findByIds(ids));
-    }
-
-    @GetMapping("/{username}/username")
-    public Mono<ResponseEntity<UserResponse>> findByUsername(@PathVariable("username") String username){
-        return userInputPort.findByUsername(username)
-                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 }

@@ -3,15 +3,11 @@ package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
-import com.fernando.ms.users.app.domain.models.Admin;
-import com.fernando.ms.users.app.domain.models.Author;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.utils.TestUtilUser;
@@ -82,9 +78,9 @@ class UserRestAdapterTest {
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Saved Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationSavedSuccessfully() throws JsonProcessingException {
-        Author author=TestUtilUser.buildAuthorMock();
+
         User user=TestUtilUser.buildUserMock();
-        when(userRestMapper.toAuthor(any(CreateUserRequest.class))).thenReturn(author);
+        when(userRestMapper.toUser(any(CreateUserRequest.class))).thenReturn(user);
         when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
@@ -98,34 +94,11 @@ class UserRestAdapterTest {
                 .jsonPath("$.names").isEqualTo("Fernando Sialer")
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
-        Mockito.verify(userRestMapper, times(1)).toAuthor(any(CreateUserRequest.class));
+        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
         Mockito.verify(userInputPort, times(1)).save(any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 
-    @Test
-    @DisplayName("When User Admin Information Is Correct Expect User Admin Information Saved Successfully")
-    void When_UserAdminInformationIsCorrect_Expect_UserAdminInformationSavedSuccessfully() throws JsonProcessingException {
-        Admin admin=TestUtilUser.buildAdminMock();
-        User user=TestUtilUser.buildUserMock();
-        when(userRestMapper.toAdmin(any(CreateUserRequest.class))).thenReturn(admin);
-        when(userInputPort.save(any(User.class))).thenReturn(Mono.just(user));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
-
-        webTestClient.post()
-                .uri("/v1/users/admin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildCreateUserRequestMock()))
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.names").isEqualTo("Fernando Sialer")
-                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
-
-        Mockito.verify(userRestMapper, times(1)).toAdmin(any(CreateUserRequest.class));
-        Mockito.verify(userInputPort, times(1)).save(any(User.class));
-        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
-    }
 
     @Test
     @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
@@ -162,49 +135,6 @@ class UserRestAdapterTest {
         Mockito.verify(userInputPort, times(1)).delete(anyLong());
     }
 
-    @Test
-    @DisplayName("When Password Is Correct Expect Password Changed Successfully")
-    void When_PasswordIsCorrect_Expect_PasswordChangedSuccessfully() throws JsonProcessingException {
-        when(userRestMapper.toUser(any(ChangePasswordRequest.class))).thenReturn( TestUtilUser.buildUserMock());
-        when(userInputPort.changePassword(anyLong(), any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
-
-        webTestClient.put()
-                .uri("/v1/users/{id}/change-password", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildChangePasswordRequestMock()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.names").isEqualTo("Fernando Sialer")
-                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
-
-        Mockito.verify(userRestMapper, times(1)).toUser(any(ChangePasswordRequest.class));
-        Mockito.verify(userInputPort, times(1)).changePassword(anyLong(), any(User.class));
-        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
-    }
-
-    @Test
-    @DisplayName("When Authentication Is Successful Expect User Returned")
-    void When_AuthenticationIsSuccessful_Expect_UserReturned() throws JsonProcessingException {
-        when(userRestMapper.toUser(any(UserAuthRequest.class))).thenReturn(TestUtilUser.buildUserMock());
-        when(userInputPort.authentication(any(User.class))).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
-
-        webTestClient.post()
-                .uri("/v1/users/auth")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(TestUtilUser.buildUserAuthRequestMock()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.names").isEqualTo("Fernando Sialer")
-                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
-
-        Mockito.verify(userRestMapper, times(1)).toUser(any(UserAuthRequest.class));
-        Mockito.verify(userInputPort, times(1)).authentication(any(User.class));
-        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
-    }
 
     @Test
     @DisplayName("When User Verification Is Successful Expect User Verified")

@@ -1,12 +1,8 @@
 package com.fernando.ms.users.app.utils;
 
-import com.fernando.ms.users.app.domain.models.Admin;
-import com.fernando.ms.users.app.domain.models.Author;
 import com.fernando.ms.users.app.domain.models.User;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.ChangePasswordRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UserAuthRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
@@ -16,26 +12,15 @@ import java.time.LocalDateTime;
 public class TestUtilUser {
 
     public static User buildUserMock(){
-        return new User(1L,"falex","Fernando","asialer05@hotmail.com",false,"123456","1234567","1234567","eeA705vb8zitg5k6WoUJ2hX1Bw3e+gkeQq4IYprPOqo=","EelI4aFBvAnuxD67e2DmtQ==");
-    }
-
-    public static Admin buildAdminMock(){
-        return new Admin("falex","Fernando","asialer05@hotmail.com","123456");
-    }
-
-    public static Author buildAuthorMock(){
-        return new Author("falex","Fernando","asialer05@hotmail.com","123456");
+        return new User(1L,"Fernando","Sialer","asialer05@hotmail.com");
     }
 
     public static UserEntity buildUserEntityMock(){
         return UserEntity.builder()
                 .id(1L)
-                .username("falex")
-                .names("Fernando Sialer")
+                .names("Fernando")
+                .lastNames("Sialer")
                 .email("asialer05@hotmail.com")
-                .passwordHash("123456")
-                .passwordSalt("123456")
-                .admin(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -52,10 +37,8 @@ public class TestUtilUser {
 
     public static CreateUserRequest buildCreateUserRequestMock(){
         return  CreateUserRequest.builder()
-                .username("falex")
                 .names("Fernando Sialer")
                 .email("asialer05@hotmail.com")
-                .password("123456")
                 .build();
     }
 
@@ -63,21 +46,6 @@ public class TestUtilUser {
         return  UpdateUserRequest.builder()
                 .names("Fernando Sialer")
                 .email("asialer05@hotmail.com")
-                .build();
-    }
-
-    public static ChangePasswordRequest buildChangePasswordRequestMock(){
-        return  ChangePasswordRequest.builder()
-                .password("123456")
-                .newPassword("1234567")
-                .confirmPassword("1234567")
-                .build();
-    }
-
-    public static UserAuthRequest buildUserAuthRequestMock(){
-        return  UserAuthRequest.builder()
-                .username("falex")
-                .password("1234567")
                 .build();
     }
 

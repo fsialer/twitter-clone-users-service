@@ -37,19 +37,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.existsByEmailIgnoreCase(email);
     }
 
-    @Override
-    public Mono<Boolean> existsByUsername(String username) {
-        return userReactiveRepository.existsByUsernameIgnoreCase(username);
-    }
 
     @Override
     public Mono<Void> delete(Long id) {
         return userReactiveRepository.deleteById(id);
-    }
-
-    @Override
-    public Mono<User> findByUsername(String username) {
-        return userReactiveRepository.findByUsername(username).map(userPersistenceMapper::toUser);
     }
 
     @Override
