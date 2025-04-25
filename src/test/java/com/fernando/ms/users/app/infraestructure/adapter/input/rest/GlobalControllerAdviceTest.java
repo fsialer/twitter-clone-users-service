@@ -21,8 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
@@ -51,10 +50,10 @@ class GlobalControllerAdviceTest {
     @Test
     @DisplayName("Expect UserNotFoundException When User Identifier Is Invalid")
     void Expect_UserNotFoundException_When_UserIdentifierIsInvalid() {
-        when(userRestAdapter.findById(anyLong())).thenReturn(Mono.error(new UserNotFoundException()));
+        when(userRestAdapter.findById(anyString())).thenReturn(Mono.error(new UserNotFoundException()));
 
         webTestClient.get()
-                .uri("/v1/users/1")
+                .uri("/v1/users/cde8c071a420424abf28b189ae2cd698")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -67,7 +66,7 @@ class GlobalControllerAdviceTest {
     @Test
     @DisplayName("Expect InternalServerError When Exception Occurs")
     void Expect_InternalServerError_When_ExceptionOccurs() {
-        when(userRestAdapter.findById(anyLong())).thenReturn(Mono.error(new RuntimeException("Unexpected error")));
+        when(userRestAdapter.findById(anyString())).thenReturn(Mono.error(new RuntimeException("Unexpected error")));
 
         webTestClient.get()
                 .uri("/v1/users/1")

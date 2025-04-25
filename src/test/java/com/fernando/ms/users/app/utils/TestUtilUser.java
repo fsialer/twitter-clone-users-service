@@ -12,15 +12,22 @@ import java.time.LocalDateTime;
 public class TestUtilUser {
 
     public static User buildUserMock(){
-        return new User(1L,"Fernando","Sialer","asialer05@hotmail.com");
+        return User.builder()
+                .id("cde8c071a420424abf28b189ae2cd6982")
+                .names("Fernando")
+                .lastNames("Sialer")
+                .email("asialer05@hotmail.com")
+                .userId("4f57f5d4f668d4ff5")
+                .build();
     }
 
     public static UserEntity buildUserEntityMock(){
         return UserEntity.builder()
-                .id(1L)
+                .id("cde8c071a420424abf28b189ae2cd6982")
                 .names("Fernando")
                 .lastNames("Sialer")
                 .email("asialer05@hotmail.com")
+                .userId("4f57f5d4f668d4ff5")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -28,23 +35,26 @@ public class TestUtilUser {
 
     public  static UserResponse buildUserResponseMock(){
         return UserResponse.builder()
-                .id(1L)
-                .username("falex")
-                .names("Fernando Sialer")
+                .id("cde8c071a420424abf28b189ae2cd6982")
+                .names("Fernando")
+                .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .build();
     }
 
     public static CreateUserRequest buildCreateUserRequestMock(){
         return  CreateUserRequest.builder()
-                .names("Fernando Sialer")
+                .names("Fernando")
+                .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
+                .userId("cde8c071a420424abf28b189ae2cd69824")
                 .build();
     }
 
     public static UpdateUserRequest buildUpdateUserRequestMock(){
         return  UpdateUserRequest.builder()
-                .names("Fernando Sialer")
+                .names("Fernando")
+                .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .build();
     }

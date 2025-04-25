@@ -18,7 +18,6 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 
@@ -46,23 +45,23 @@ class UserServiceTest {
     @Test
     @DisplayName("When User Identifier Is Correct Except User Information Correct")
     void When_UserIdentifierIsCorrect_Except_UserInformationCorrect(){
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-        Mono<User> userMono=userService.finById(1L);
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        Mono<User> userMono=userService.findById("cde8c071a420424abf28b189ae2cd698");
         StepVerifier.create(userMono)
                 .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
-        Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort,times(1)).findById(anyString());
     }
 
     @Test
     @DisplayName("Expect UserNotFoundException When User Identifier Is Invalid")
     void Expect_UserNotFoundException_When_UserIdentifierIsInvalid(){
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.empty());
-        Mono<User> userMono=userService.finById(1L);
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.empty());
+        Mono<User> userMono=userService.findById("cde8c071a420424abf28b189ae2cd698");
         StepVerifier.create(userMono)
                 .expectError(UserNotFoundException.class)
                 .verify();
-        Mockito.verify(userPersistencePort,times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort,times(1)).findById(anyString());
     }
 
 
@@ -103,17 +102,17 @@ class UserServiceTest {
         User updatedUser = TestUtilUser.buildUserMock();
         updatedUser.setEmail("newemail@example.com");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(false));
         when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
 
-        Mono<User> result = userService.update(1L, updatedUser);
+        Mono<User> result = userService.update("cde8c071a420424abf28b189ae2cd698", updatedUser);
 
         StepVerifier.create(result)
                 .expectNext(updatedUser)
                 .verifyComplete();
 
-        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).findById(anyString());
         Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
         Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
     }
@@ -127,16 +126,16 @@ class UserServiceTest {
         User existingUser = TestUtilUser.buildUserMock();
         existingUser.setEmail("existingemail@example.com");
 
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just( existingUser));
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.just( existingUser));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(Mono.just(true));
 
-        Mono<User> result = userService.update(1L, updatedUser);
+        Mono<User> result = userService.update("cde8c071a420424abf28b189ae2cd698", updatedUser);
 
         StepVerifier.create(result)
                 .expectError(UserEmailAlreadyExistsException.class)
                 .verify();
 
-        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).findById(anyString());
         Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
     }
@@ -145,72 +144,72 @@ class UserServiceTest {
     @Test
     @DisplayName("When User Exists Expect User Deleted Successfully")
     void When_UserExists_Expect_UserDeletedSuccessfully() {
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-        when(userPersistencePort.delete(anyLong())).thenReturn(Mono.empty());
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userPersistencePort.delete(anyString())).thenReturn(Mono.empty());
 
-        Mono<Void> result = userService.delete(1L);
+        Mono<Void> result = userService.delete("cde8c071a420424abf28b189ae2cd698");
 
         StepVerifier.create(result)
                 .verifyComplete();
 
-        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
-        Mockito.verify(userPersistencePort, times(1)).delete(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).findById(anyString());
+        Mockito.verify(userPersistencePort, times(1)).delete(anyString());
     }
 
     @Test
     @DisplayName("Expect UserNotFoundException When User Does Not Exist")
     void Expect_UserNotFoundException_When_UserDoesNotExist() {
-        when(userPersistencePort.finById(anyLong())).thenReturn(Mono.empty());
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.empty());
 
-        Mono<Void> result = userService.delete(1L);
+        Mono<Void> result = userService.delete("cde8c071a420424abf28b189ae2cd698");
 
         StepVerifier.create(result)
                 .expectError(UserNotFoundException.class)
                 .verify();
 
-        Mockito.verify(userPersistencePort, times(1)).finById(anyLong());
-        Mockito.verify(userPersistencePort, Mockito.never()).delete(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).findById(anyString());
+        Mockito.verify(userPersistencePort, Mockito.never()).delete(anyString());
     }
 
     @Test
     @DisplayName("When User Verification Is Successful Expect User Verified")
     void When_UserVerificationIsSuccessful_Expect_UserVerified() {
 
-        when(userPersistencePort.verifyUser(anyLong())).thenReturn(Mono.just(true));
+        when(userPersistencePort.verifyUser(anyString())).thenReturn(Mono.just(true));
 
-        Mono<Boolean> result = userService.verifyUser(1L);
+        Mono<Boolean> result = userService.verifyUser("cde8c071a420424abf28b189ae2cd698");
 
         StepVerifier.create(result)
                 .expectNext(true)
                 .verifyComplete();
 
-        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyString());
     }
 
     @Test
     @DisplayName("When User Verification Is Incorrect Expect User Do Not Verified")
     void When_UserVerificationIsIncorrect_Expect_UserDoNotVerified() {
 
-        when(userPersistencePort.verifyUser(anyLong())).thenReturn(Mono.just(false));
+        when(userPersistencePort.verifyUser(anyString())).thenReturn(Mono.just(false));
 
-        Mono<Boolean> result = userService.verifyUser(1L);
+        Mono<Boolean> result = userService.verifyUser("cde8c071a420424abf28b189ae2cd698");
 
         StepVerifier.create(result)
                 .expectNext(false)
                 .verifyComplete();
 
-        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userPersistencePort, times(1)).verifyUser(anyString());
     }
 
     @Test
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
         User user2 = TestUtilUser.buildUserMock();
-        user2.setId(2L);
+        user2.setId("cde8c071a420424abf28b189ae2cd6982");
 
         when(userPersistencePort.findByIds(anyIterable())).thenReturn(Flux.just( TestUtilUser.buildUserMock(), user2));
 
-        Flux<User> result = userService.findByIds(List.of(1L, 2L));
+        Flux<User> result = userService.findByIds(List.of("cde8c071a420424abf28b189ae2cd698","cde8c071a420424abf28b189ae2cd6982"));
 
         StepVerifier.create(result)
                 .expectNext(TestUtilUser.buildUserMock())

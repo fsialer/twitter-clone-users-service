@@ -11,8 +11,8 @@ import java.util.Objects;
 @Builder
 @EqualsAndHashCode
 public class UserResponse {
-    private Long id;
-    private String username;
+    private String id;
     private String names;
+    private String lastNames;
     private String email;
 }

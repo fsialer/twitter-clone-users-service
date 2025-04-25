@@ -20,8 +20,8 @@ public class UserService implements UserInputPort {
     }
 
     @Override
-    public Mono<User> finById(Long id) {
-        return userPersistencePort.finById(id).switchIfEmpty(Mono.error(UserNotFoundException::new));
+    public Mono<User> findById(String id) {
+        return userPersistencePort.findById(id).switchIfEmpty(Mono.error(UserNotFoundException::new));
     }
 
     @Override
@@ -37,11 +37,12 @@ public class UserService implements UserInputPort {
     }
 
     @Override
-    public Mono<User> update(Long id, User user) {
-       return userPersistencePort.finById(id)
+    public Mono<User> update(String id, User user) {
+       return userPersistencePort.findById(id)
                 .switchIfEmpty(Mono.error(UserNotFoundException::new))
                 .flatMap(userInfo->{
                     userInfo.setNames(user.getNames());
+                    userInfo.setLastNames(user.getLastNames());
                     return Mono.just(userInfo)
                             .filter(user1 -> !user1.getEmail().equals(user.getEmail()))
                             .flatMap(user1-> userPersistencePort.existsByEmail(user.getEmail())
@@ -58,19 +59,19 @@ public class UserService implements UserInputPort {
     }
 
     @Override
-    public Mono<Void> delete(Long id) {
-        return userPersistencePort.finById(id)
+    public Mono<Void> delete(String id) {
+        return userPersistencePort.findById(id)
                 .switchIfEmpty(Mono.error(UserNotFoundException::new))
                 .flatMap(user->userPersistencePort.delete(id));
     }
 
     @Override
-    public Mono<Boolean> verifyUser(Long id) {
+    public Mono<Boolean> verifyUser(String id) {
         return userPersistencePort.verifyUser(id);
     }
 
     @Override
-    public Flux<User> findByIds(Iterable<Long> ids) {
+    public Flux<User> findByIds(Iterable<String> ids) {
         return userPersistencePort.findByIds(ids);
     }
 }

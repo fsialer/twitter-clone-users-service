@@ -23,7 +23,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     }
 
     @Override
-    public Mono<User> finById(Long id) {
+    public Mono<User> findById(String id) {
         return userReactiveRepository.findById(id).map(userPersistenceMapper::toUser);
     }
 
@@ -39,17 +39,17 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
 
     @Override
-    public Mono<Void> delete(Long id) {
+    public Mono<Void> delete(String id) {
         return userReactiveRepository.deleteById(id);
     }
 
     @Override
-    public Mono<Boolean> verifyUser(Long id) {
+    public Mono<Boolean> verifyUser(String id) {
         return userReactiveRepository.existsById(id);
     }
 
     @Override
-    public Flux<User> findByIds(Iterable<Long> ids) {
+    public Flux<User> findByIds(Iterable<String> ids) {
         return userPersistenceMapper.toUsers(userReactiveRepository.findAllById(ids));
     }
 

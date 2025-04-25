@@ -12,7 +12,11 @@ import lombok.*;
 public class CreateUserRequest {
     @NotBlank(message = "Field names cannot be null or blank")
     private String names;
+    @NotBlank(message = "Field lastNames cannot be null or blank")
+    private String lastNames;
     @NotBlank(message = "Field email cannot be null or blank")
     @Email(message="Field email must be a valid")
     private String email;
+    @NotBlank(message = "Field userId cannot be null or blank")
+    private String userId;
 }

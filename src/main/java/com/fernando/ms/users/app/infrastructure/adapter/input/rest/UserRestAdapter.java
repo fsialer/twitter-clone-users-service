@@ -31,8 +31,8 @@ public class UserRestAdapter{
     }
 
     @GetMapping("/{id}")
-    public Mono<UserResponse> findById(@PathVariable Long id){
-        return userRestMapper.toUserResponse(userInputPort.finById(id));
+    public Mono<UserResponse> findById(@PathVariable String id){
+        return userRestMapper.toUserResponse(userInputPort.findById(id));
     }
 
     @PostMapping
@@ -45,25 +45,25 @@ public class UserRestAdapter{
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserResponse>> update(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest rq){
+    public Mono<ResponseEntity<UserResponse>> update(@PathVariable String id,@Valid @RequestBody UpdateUserRequest rq){
         return userInputPort.update(id,userRestMapper.toUser(rq))
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> update(@PathVariable Long id){
+    public Mono<Void> update(@PathVariable String id){
         return userInputPort.delete(id);
     }
 
     @GetMapping("/{id}/verify")
-    public Mono<ResponseEntity<ExistsUserResponse>> verify(@PathVariable("id") Long id){
+    public Mono<ResponseEntity<ExistsUserResponse>> verify(@PathVariable("id") String id){
         return userInputPort.verifyUser(id)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toExistsUserResponse(user))));
     }
 
     @GetMapping("/find-by-ids")
-    public Flux<UserResponse> findByIds(@RequestParam("ids") List<Long> ids){
+    public Flux<UserResponse> findByIds(@RequestParam("ids") List<String> ids){
         return userRestMapper.toUsersResponse(userInputPort.findByIds(ids));
     }
 }

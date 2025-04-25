@@ -2,8 +2,6 @@ package com.fernando.ms.users.app.domain.models;
 
 import lombok.*;
 
-import java.util.Objects;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -11,8 +9,9 @@ import java.util.Objects;
 @Builder
 @EqualsAndHashCode
 public class User {
-    private Long id;
+    private String id;
     private String names;
     private String lastNames;
     private String email;
+    private String userId;
 }

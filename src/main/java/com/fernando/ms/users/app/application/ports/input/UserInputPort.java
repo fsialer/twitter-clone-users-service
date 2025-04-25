@@ -6,11 +6,11 @@ import reactor.core.publisher.Mono;
 
 public interface UserInputPort {
     Flux<User> findAll();
-    Mono<User> finById(Long id);
+    Mono<User> findById(String id);
     Mono<User> save(User user);
-    Mono<User> update(Long id,User user);
-    Mono<Void> delete(Long id);
-    Mono<Boolean> verifyUser(Long id);
-    Flux<User> findByIds(Iterable<Long> ids);
+    Mono<User> update(String id,User user);
+    Mono<Void> delete(String id);
+    Mono<Boolean> verifyUser(String id);
+    Flux<User> findByIds(Iterable<String> ids);
 }
    

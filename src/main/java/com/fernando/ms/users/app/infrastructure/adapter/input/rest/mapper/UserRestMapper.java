@@ -26,6 +26,10 @@ public interface UserRestMapper {
     User toUser(CreateUserRequest rq);
     User toUser(UpdateUserRequest rq);
 
+
+
+    //UserResponse toUserResponse(User user);
+
     default ExistsUserResponse toExistsUserResponse(Boolean exists){
         return ExistsUserResponse.builder()
                 .exists(exists)

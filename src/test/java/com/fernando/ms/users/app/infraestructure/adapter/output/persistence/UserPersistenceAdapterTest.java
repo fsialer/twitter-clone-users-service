@@ -51,14 +51,14 @@ class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When User Identifier Is Correct Expect User Information Correct")
     void When_UserIdentifierIsCorrect_Expect_UserInformationCorrect(){
-        when(userReactiveRepository.findById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserEntityMock()));
+        when(userReactiveRepository.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserEntityMock()));
         when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
 
-        Mono<User> result=userPersistenceAdapter.finById(1L);
+        Mono<User> result=userPersistenceAdapter.findById("cde8c071a420424abf28b189ae2cd698");
         StepVerifier.create(result)
                 .expectNext(TestUtilUser.buildUserMock())
                 .verifyComplete();
-        Mockito.verify(userReactiveRepository,times(1)).findById(anyLong());
+        Mockito.verify(userReactiveRepository,times(1)).findById(anyString());
         Mockito.verify(userPersistenceMapper,times(1)).toUser(any(UserEntity.class));
     }
 
@@ -93,39 +93,39 @@ class UserPersistenceAdapterTest {
     @Test
     @DisplayName("When User Exists Expect User Deleted Successfully")
     void When_UserExists_Expect_UserDeletedSuccessfully() {
-        when(userReactiveRepository.deleteById(anyLong())).thenReturn(Mono.empty());
-        Mono<Void> result = userPersistenceAdapter.delete(1L);
+        when(userReactiveRepository.deleteById(anyString())).thenReturn(Mono.empty());
+        Mono<Void> result = userPersistenceAdapter.delete("cde8c071a420424abf28b189ae2cd698");
         StepVerifier.create(result)
                 .verifyComplete();
-        Mockito.verify(userReactiveRepository, times(1)).deleteById(anyLong());
+        Mockito.verify(userReactiveRepository, times(1)).deleteById(anyString());
     }
 
     @Test
     @DisplayName("When User Verification Is Successful Expect User Verified")
     void When_UserVerificationIsSuccessful_Expect_UserVerified() {
-        when(userReactiveRepository.existsById(anyLong())).thenReturn(Mono.just(true));
+        when(userReactiveRepository.existsById(anyString())).thenReturn(Mono.just(true));
 
-        Mono<Boolean> result = userPersistenceAdapter.verifyUser(1L);
+        Mono<Boolean> result = userPersistenceAdapter.verifyUser("cde8c071a420424abf28b189ae2cd698");
 
         StepVerifier.create(result)
                 .expectNext(true)
                 .verifyComplete();
 
-        Mockito.verify(userReactiveRepository, times(1)).existsById(anyLong());
+        Mockito.verify(userReactiveRepository, times(1)).existsById(anyString());
     }
 
     @Test
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
         User user2 = TestUtilUser.buildUserMock();
-        user2.setId(2L);
+        user2.setId("cde8c071a420424abf28b189ae2cd6982");
         UserEntity userEntity2 = TestUtilUser.buildUserEntityMock();
-        userEntity2.setId(2L);
+        userEntity2.setId("cde8c071a420424abf28b189ae2cd6982");
 
         when(userReactiveRepository.findAllById(anyIterable())).thenReturn(Flux.just(TestUtilUser.buildUserEntityMock(), userEntity2));
         when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(TestUtilUser.buildUserMock(), user2));
 
-        Flux<User> result = userPersistenceAdapter.findByIds(List.of(1L, 2L));
+        Flux<User> result = userPersistenceAdapter.findByIds(List.of("cde8c071a420424abf28b189ae2cd698", "cde8c071a420424abf28b189ae2cd6982"));
 
         StepVerifier.create(result)
                 .expectNext(TestUtilUser.buildUserMock())

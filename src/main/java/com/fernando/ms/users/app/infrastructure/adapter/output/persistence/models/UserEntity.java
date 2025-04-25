@@ -2,7 +2,8 @@ package com.fernando.ms.users.app.infrastructure.adapter.output.persistence.mode
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
@@ -12,13 +13,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-@Table
+@Document(collection = "users")
 public class UserEntity {
     @Id
-    private Long id;
+    private String id;
     private String names;
     private String lastNames;
+    @Indexed
     private String email;
+    private String userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -52,7 +52,7 @@ class UserRestAdapterTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$[0].names").isEqualTo("Fernando Sialer")
+                .jsonPath("$[0].names").isEqualTo("Fernando")
                 .jsonPath("$[0].email").isEqualTo("asialer05@hotmail.com");
         Mockito.verify(userInputPort,times(1)).findAll();
         Mockito.verify(userRestMapper,times(1)).toUsersResponse(any(Flux.class));
@@ -61,16 +61,16 @@ class UserRestAdapterTest {
     @Test
     @DisplayName("When UserIdentifier Is Correct Expect User Information Successfully")
     void When_UserIdentifierIsCorrect_Expect_UserInformationSuccessfully() {
-     when(userInputPort.finById(anyLong())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+     when(userInputPort.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
      when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just( TestUtilUser.buildUserResponseMock()));
      webTestClient.get()
              .uri("/v1/users/{id}",1L)
              .exchange()
              .expectStatus().isOk()
              .expectBody()
-             .jsonPath("$.names").isEqualTo("Fernando Sialer")
+             .jsonPath("$.names").isEqualTo("Fernando")
              .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
-        Mockito.verify(userInputPort,times(1)).finById(anyLong());
+        Mockito.verify(userInputPort,times(1)).findById(anyString());
         Mockito.verify(userRestMapper,times(1)).toUserResponse(any(Mono.class));
     }
 
@@ -91,7 +91,7 @@ class UserRestAdapterTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.names").isEqualTo("Fernando")
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
         Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
@@ -104,7 +104,7 @@ class UserRestAdapterTest {
     @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
     void When_UserInformationIsCorrect_Expect_UserInformationUpdatedSuccessfully() throws JsonProcessingException {
         when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn( TestUtilUser.buildUserMock());
-        when(userInputPort.update(anyLong(),any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userInputPort.update(anyString(),any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
         when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
 
         webTestClient.put()
@@ -114,32 +114,32 @@ class UserRestAdapterTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.names").isEqualTo("Fernando Sialer")
+                .jsonPath("$.names").isEqualTo("Fernando")
                 .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
 
         Mockito.verify(userRestMapper, times(1)).toUser(any(UpdateUserRequest.class));
-        Mockito.verify(userInputPort, times(1)).update(anyLong(),any(User.class));
+        Mockito.verify(userInputPort, times(1)).update(anyString(),any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
 
     @Test
     @DisplayName("When User Exists Expect User Deleted Successfully")
     void When_UserExists_Expect_UserDeletedSuccessfully() {
-        when(userInputPort.delete(anyLong())).thenReturn(Mono.empty());
+        when(userInputPort.delete(anyString())).thenReturn(Mono.empty());
 
         webTestClient.delete()
                 .uri("/v1/users/{id}", 1L)
                 .exchange()
                 .expectStatus().isNoContent();
 
-        Mockito.verify(userInputPort, times(1)).delete(anyLong());
+        Mockito.verify(userInputPort, times(1)).delete(anyString());
     }
 
 
     @Test
     @DisplayName("When User Verification Is Successful Expect User Verified")
     void When_UserVerificationIsSuccessful_Expect_UserVerified() {
-        when(userInputPort.verifyUser(anyLong())).thenReturn(Mono.just(true));
+        when(userInputPort.verifyUser(anyString())).thenReturn(Mono.just(true));
         when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(TestUtilUser.buildExistsUserResponseMock());
 
         webTestClient.get()
@@ -149,7 +149,7 @@ class UserRestAdapterTest {
                 .expectBody()
                 .jsonPath("$.exists").isEqualTo(true);
 
-        Mockito.verify(userInputPort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userInputPort, times(1)).verifyUser(anyString());
         Mockito.verify(userRestMapper, times(1)).toExistsUserResponse(anyBoolean());
     }
 
@@ -158,7 +158,7 @@ class UserRestAdapterTest {
     void When_UserVerificationIsIncorrect_Expect_UserDoNotVerified() {
         ExistsUserResponse existsUserResponse = TestUtilUser.buildExistsUserResponseMock();
         existsUserResponse.setExists(false);
-        when(userInputPort.verifyUser(anyLong())).thenReturn(Mono.just(false));
+        when(userInputPort.verifyUser(anyString())).thenReturn(Mono.just(false));
         when(userRestMapper.toExistsUserResponse(anyBoolean())).thenReturn(existsUserResponse);
 
         webTestClient.get()
@@ -168,7 +168,7 @@ class UserRestAdapterTest {
                 .expectBody()
                 .jsonPath("$.exists").isEqualTo(false);
 
-        Mockito.verify(userInputPort, times(1)).verifyUser(anyLong());
+        Mockito.verify(userInputPort, times(1)).verifyUser(anyString());
         Mockito.verify(userRestMapper, times(1)).toExistsUserResponse(anyBoolean());
     }
 
@@ -176,9 +176,9 @@ class UserRestAdapterTest {
     @DisplayName("When User IDs Are Correct Expect Users Returned")
     void When_UserIDsAreCorrect_Expect_UsersReturned() {
         UserResponse userResponse2 = TestUtilUser.buildUserResponseMock();
-        userResponse2.setId(2L);
+        userResponse2.setId("cde8c071a420424abf28b189ae2cd6982");
         User user2 = TestUtilUser.buildUserMock();
-        user2.setId(2L);
+        user2.setId("cde8c071a420424abf28b189ae2cd69824");
 
         when(userInputPort.findByIds(anyList())).thenReturn(Flux.just(TestUtilUser.buildUserMock(), user2));
         when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just( TestUtilUser.buildUserResponseMock(), userResponse2));
