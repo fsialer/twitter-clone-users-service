@@ -1,10 +1,12 @@
-spring:
+server:
   port: 8080
+spring:
   application:
     name: twitter-clone-users-service
   jackson:
     default-property-inclusion: NON_NULL
-  r2dbc:
-    url: ${DB_HOST:mongodb://localhost:27017/tc_users_db?authSource=admin}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:1234}
+  data:
+    mongodb:
+      uri: ${DB_HOST:mongodb://localhost:27017/tc_users_db?authSource=admin}
+      username: ${DB_USERNAME:root}
+      password: ${DB_PASSWORD:1234}

@@ -1,0 +1,34 @@
+# MICROSERVICIO DE USUARIOS
+> Este microservicio se encarga de gestionar los usuarios tanto sus datos personales y podra interactuar siguiendo a otros usuarios registrados.
+
+## Variables de entorno
+```
+DB_HOST=mongodb://localhost:27017/posts_db?authSource=admin
+```
+```
+DB_USERNAME=admin
+```
+```
+DB_PASSWORD=*****
+```
+
+## Tabla de recursos
+| NOMBRE                                         | RUTA                      | PETICION | PARAMETROS                                             | CUERPO                                                                           | 
+|------------------------------------------------|---------------------------|----------|--------------------------------------------------------|----------------------------------------------------------------------------------|
+| Listar usuarios                                | /v1/users                 | GET      | NINGUNO                                                | NINGUNO                                                                          |
+| Obtener usuario por id                         | /v1/users/{id}            | GET      | NINGUNO                                                | NINGUNO                                                                          |
+| Crear usuario                                  | /v1/users                 | POST     | NINGUNO                                                | {<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>"userId":"cde8c071a420424abf2"<br/>} |
+| Actualizar usuario                             | /v1/users/{id}            | PUT      | NINGUNO                                                |{<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>}|
+| Eliminar usuario                               | /v1/users/{id}            | DELETE   | NINGUNO                                                | NINGUNO                                                                          |
+| Verificar usuario                              | /v1/users/{id}/verify     | GET      | NINGUNO                                                | NINGUNO                                                                          |
+| Listar usuarios por ids                        | /v1/users/find-by-ids | GET      | ?ids=6804498d871f48237c0f5e40,6804498d871f48237c0f5e47 | {<br/>"postId":"6804498d871f48237c0f5e40",<br/> "typeTarget":"LIKE"<br/>}        |
+
+## Stack
+* SPRING BOOT
+* SPRING WEBFLUX
+* SPRING DATA
+* MONGODB
+* LOMBOK
+* MAPSTRUCT
+* MOCKITO
+* JUNIT
