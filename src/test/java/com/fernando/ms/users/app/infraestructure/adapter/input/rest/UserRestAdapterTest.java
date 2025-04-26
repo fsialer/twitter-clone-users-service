@@ -230,6 +230,18 @@ class UserRestAdapterTest {
         Mockito.verify(followInputPort, times(1)).followUser(any(Follow.class));
     }
 
+    @Test
+    @DisplayName("When ValidFollowId Expect UnfollowSuccessfully")
+    void When_ValidFollowId_Expect_UnfollowSuccessfully() {
+        when(followInputPort.unFollowUser(anyString(), anyString())).thenReturn(Mono.empty());
+        webTestClient.delete()
+                .uri("/v1/users/unfollow/{id}", "followId123")
+                .header("X-User-Id", "userId123")
+                .exchange()
+                .expectStatus().isNoContent();
+
+        verify(followInputPort, times(1)).unFollowUser("followId123", "userId123");
+    }
 
 
 }

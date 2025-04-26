@@ -146,4 +146,39 @@ public class FollowServiceTest {
         verify(userPersistencePort, times(2)).findByUserId(anyString());
         verify(followPersistencePort, times(1)).saveUserFollowed(follow);
     }
+
+    @Test
+    @DisplayName("When User Follows Another Expect Unfollow Successfully")
+    void When_UserFollowsAnother_Expect_UnfollowSuccessfully() {
+        Follow follow = TestUtilFollow.buildFollowMock();
+
+        when(followPersistencePort.findByIdAndFollowerId(anyString(), anyString()))
+                .thenReturn(Mono.just(follow));
+        when(followPersistencePort.delete(anyString()))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = followService.unFollowUser("followId", "followerId");
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        verify(followPersistencePort, times(1)).findByIdAndFollowerId(anyString(), anyString());
+        verify(followPersistencePort, times(1)).delete(anyString());
+    }
+
+    @Test
+    @DisplayName("Expect UserRuleException When User Does Not Follow Another")
+    void Expect_UserRuleException_When_UserDoesNotFollowAnother_() {
+        when(followPersistencePort.findByIdAndFollowerId(anyString(), anyString()))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = followService.unFollowUser("followId", "followerId");
+
+        StepVerifier.create(result)
+                .expectError(UserRuleException.class)
+                .verify();
+
+        verify(followPersistencePort, times(1)).findByIdAndFollowerId(anyString(), anyString());
+        verify(followPersistencePort, never()).delete(anyString());
+    }
 }

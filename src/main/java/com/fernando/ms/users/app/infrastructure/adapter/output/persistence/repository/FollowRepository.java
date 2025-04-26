@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface FollowRepository extends ReactiveMongoRepository<FollowDocument,String> {
     Mono<Boolean> existsByFollowerIdAndFollowedIdIgnoreCase(String followerId,String followedId);
+    Mono<FollowDocument> findByIdAndFollowerId(String id,String followerId);
 }

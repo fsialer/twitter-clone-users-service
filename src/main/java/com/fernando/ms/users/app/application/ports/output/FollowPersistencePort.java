@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 public interface FollowPersistencePort {
     Mono<Void> saveUserFollowed(Follow follow);
     Mono<Boolean> verifyFollow(String followerId,String followedId);
+    Mono<Follow> findByIdAndFollowerId(String id,String followerId);
+    Mono<Void> delete(String id);
 }

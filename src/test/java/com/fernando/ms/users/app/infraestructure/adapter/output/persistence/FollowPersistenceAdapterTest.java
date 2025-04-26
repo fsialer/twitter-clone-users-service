@@ -74,4 +74,37 @@ public class FollowPersistenceAdapterTest {
         verify(followRepository, times(1)).save(any());
     }
 
+    @Test
+    @DisplayName("When Identifier Of Follower And Followed Existing Expect Information Follower")
+    void When_IdentifierOfFollowerAndFollowedExisting_Expect_InformationFollower() {
+        FollowDocument followDocument = TestUtilFollow.buildFollowDocumentMock();
+        Follow follow = TestUtilFollow.buildFollowMock();
+
+        when(followRepository.findByIdAndFollowerId(anyString(), anyString()))
+                .thenReturn(Mono.just(followDocument));
+        when(followPersistenceMapper.toFollow(followDocument))
+                .thenReturn(follow);
+
+        Mono<Follow> result = followPersistenceAdapter.findByIdAndFollowerId("followId", "followerId");
+
+        StepVerifier.create(result)
+                .expectNext(follow)
+                .verifyComplete();
+
+        verify(followRepository, times(1)).findByIdAndFollowerId(anyString(), anyString());
+        verify(followPersistenceMapper, times(1)).toFollow(followDocument);
+    }
+
+    @Test
+    @DisplayName("When Identifier Of Follower Existing Expect Information Delete Correctly Follower")
+    void When_IdentifierOfFollowerExisting_Expect_InformationDeleteCorrectlyFollower() {
+        when(followRepository.deleteById(anyString()))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = followPersistenceAdapter.delete("followId");
+        StepVerifier.create(result)
+                .verifyComplete();
+        verify(followRepository, times(1)).deleteById("followId");
+    }
+
 }

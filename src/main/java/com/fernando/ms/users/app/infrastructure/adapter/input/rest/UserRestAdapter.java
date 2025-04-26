@@ -79,4 +79,11 @@ public class UserRestAdapter{
                                   @Valid @RequestBody CreateFollowRequest rq){
         return followInputPort.followUser(followRestMapper.toFollow(userId,rq));
     }
+
+    @DeleteMapping("/unfollow/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> unfollowUser( @RequestHeader("X-User-Id") String userId,
+                                    @PathVariable("id") String id){
+        return followInputPort.unFollowUser(id,userId);
+    }
 }

@@ -22,4 +22,14 @@ public class FollowPersistenceAdapter implements FollowPersistencePort {
     public Mono<Boolean> verifyFollow(String followerId, String followedId) {
         return followRepository.existsByFollowerIdAndFollowedIdIgnoreCase(followerId,followedId);
     }
+
+    @Override
+    public Mono<Follow> findByIdAndFollowerId(String id,String followerId) {
+        return followRepository.findByIdAndFollowerId(id,followerId).map(followPersistenceMapper::toFollow);
+    }
+
+    @Override
+    public Mono<Void> delete(String id) {
+        return followRepository.deleteById(id);
+    }
 }

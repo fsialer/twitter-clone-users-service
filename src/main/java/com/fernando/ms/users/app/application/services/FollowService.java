@@ -34,4 +34,11 @@ public class FollowService implements FollowInputPort {
                                 .flatMap(verify -> followPersistencePort.saveUserFollowed(follow))
                 );
     }
+
+    @Override
+    public Mono<Void> unFollowUser(String id, String followerId) {
+        return followPersistencePort.findByIdAndFollowerId(id,followerId)
+                .switchIfEmpty(Mono.error(new UserRuleException("You don't follow this user.")))
+                .flatMap(follow -> followPersistencePort.delete(follow.getId()));
+    }
 }
