@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 import static com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.enums.ErrorType.FUNCTIONAL;
 import static com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.enums.ErrorType.SYSTEM;
@@ -49,17 +50,6 @@ public class GlobalControllerAdvice {
                 .build());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserUsernameAlreadyExistsException.class)
-    public  Mono<ErrorResponse> handleUserUsernameAlreadyExistsException(UserUsernameAlreadyExistsException e) {
-        return Mono.just(ErrorResponse.builder()
-                .code(USER_USERNAME_ALREADY_EXISTS.getCode())
-                .type(FUNCTIONAL)
-                .message(USER_USERNAME_ALREADY_EXISTS.getMessage())
-                .timestamp(LocalDate.now().toString())
-                .details(Collections.singletonList(e.getMessage()))
-                .build());
-    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserEmailAlreadyExistsException.class)
@@ -74,26 +64,39 @@ public class GlobalControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(CredentialFailedException.class)
-    public  Mono<ErrorResponse> handleCredentialFailedException() {
+    @ExceptionHandler(UserRuleException.class)
+    public  Mono<ErrorResponse> handleUserRuleException(UserRuleException ex) {
         return Mono.just(ErrorResponse.builder()
-                .code(USER_CREDENTIAL_FAIL.getCode())
+                .code(USER_RULE_INVALID.getCode())
                 .type(FUNCTIONAL)
-                .message(USER_CREDENTIAL_FAIL.getMessage())
+                .message(USER_RULE_INVALID.getMessage())
+                .timestamp(LocalDate.now().toString())
+                        .details(List.of(ex.getMessage()))
+                .build());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(FollowerNotFoundException.class)
+    public Mono<ErrorResponse> handleFollowerNotFoundException() {
+        return Mono.just(ErrorResponse.builder()
+                .code(USER_FOLLOWER_NOT_FOUND.getCode())
+                .type(FUNCTIONAL)
+                .message(USER_FOLLOWER_NOT_FOUND.getMessage())
                 .timestamp(LocalDate.now().toString())
                 .build());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(PasswordNotConfirmException.class)
-    public  Mono<ErrorResponse> handlePasswordNotConfirmException(PasswordNotConfirmException e) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(FollowedNotFoundException.class)
+    public Mono<ErrorResponse> handleFollowedNotFoundException() {
         return Mono.just(ErrorResponse.builder()
-                .code(USER_PASSWORD_NO_CONFIRM.getCode())
+                .code(USER_FOLLOWED_NOT_FOUND.getCode())
                 .type(FUNCTIONAL)
-                .message(USER_PASSWORD_NO_CONFIRM.getMessage())
+                .message(USER_FOLLOWED_NOT_FOUND.getMessage())
                 .timestamp(LocalDate.now().toString())
                 .build());
     }
+
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)

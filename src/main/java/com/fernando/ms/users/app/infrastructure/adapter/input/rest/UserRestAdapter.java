@@ -1,8 +1,11 @@
 package com.fernando.ms.users.app.infrastructure.adapter.input.rest;
 
 
+import com.fernando.ms.users.app.application.ports.input.FollowInputPort;
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.FollowRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
@@ -24,6 +27,8 @@ import java.util.List;
 public class UserRestAdapter{
     private final UserInputPort userInputPort;
     private final UserRestMapper userRestMapper;
+    private final FollowInputPort followInputPort;
+    private final FollowRestMapper followRestMapper;
 
     @GetMapping
     public Flux<UserResponse> findAll(){
@@ -31,15 +36,16 @@ public class UserRestAdapter{
     }
 
     @GetMapping("/{id}")
-    public Mono<UserResponse> findById(@PathVariable String id){
-        return userRestMapper.toUserResponse(userInputPort.findById(id));
+    public Mono<ResponseEntity<UserResponse>> findById(@PathVariable String id){
+        return userInputPort.findById(id)
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 
     @PostMapping
     public Mono<ResponseEntity<UserResponse>> save(@Valid @RequestBody CreateUserRequest rq){
         return userInputPort.save(userRestMapper.toUser(rq))
                 .flatMap(user -> {
-                    String location = "/users/".concat(user.getId().toString());
+                    String location = "/users/".concat(user.getId());
                     return Mono.just(ResponseEntity.created(URI.create(location)).body(userRestMapper.toUserResponse(user)));
                 });
     }
@@ -52,7 +58,7 @@ public class UserRestAdapter{
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> update(@PathVariable String id){
+    public Mono<Void> delete(@PathVariable String id){
         return userInputPort.delete(id);
     }
 
@@ -65,5 +71,12 @@ public class UserRestAdapter{
     @GetMapping("/find-by-ids")
     public Flux<UserResponse> findByIds(@RequestParam("ids") List<String> ids){
         return userRestMapper.toUsersResponse(userInputPort.findByIds(ids));
+    }
+
+    @PostMapping("/follow")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> followUser( @RequestHeader("X-User-Id") String userId,
+                                  @Valid @RequestBody CreateFollowRequest rq){
+        return followInputPort.followUser(followRestMapper.toFollow(userId,rq));
     }
 }

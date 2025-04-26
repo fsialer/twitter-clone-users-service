@@ -2,14 +2,20 @@ package com.fernando.ms.users.app.infraestructure.adapter.input.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fernando.ms.users.app.application.ports.input.FollowInputPort;
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
+import com.fernando.ms.users.app.domain.models.Follow;
 import com.fernando.ms.users.app.domain.models.User;
+
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.UserRestAdapter;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.FollowRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
+import com.fernando.ms.users.app.utils.TestUtilFollow;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +29,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebFluxTest({UserRestAdapter.class})
 class UserRestAdapterTest {
@@ -39,6 +44,13 @@ class UserRestAdapterTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private FollowRestMapper followRestMapper;
+
+    @MockitoBean
+    private FollowInputPort followInputPort;
+
 
 
     @Test
@@ -64,7 +76,7 @@ class UserRestAdapterTest {
      when(userInputPort.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
      when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just( TestUtilUser.buildUserResponseMock()));
      webTestClient.get()
-             .uri("/v1/users/{id}",1L)
+             .uri("/v1/users/{id}","1L")
              .exchange()
              .expectStatus().isOk()
              .expectBody()
@@ -194,6 +206,28 @@ class UserRestAdapterTest {
 
         Mockito.verify(userInputPort, times(1)).findByIds(anyList());
         Mockito.verify(userRestMapper, times(1)).toUsersResponse(any(Flux.class));
+    }
+
+    @Test
+    @DisplayName("When ValidFollowRequest Expect User Followed Successfully")
+    void When_ValidFollowRequest_Expect_UserFollowedSuccessfully() {
+        CreateFollowRequest createFollowRequest = TestUtilFollow.buildCreateFollowRequestMock();
+        Follow follow=TestUtilFollow.buildFollowMock();
+        when(followRestMapper.toFollow(anyString(), any(CreateFollowRequest.class)))
+                .thenReturn(follow);
+
+        when(followInputPort.followUser(any(Follow.class))).thenReturn(Mono.empty());
+
+        webTestClient.post()
+                .uri("/v1/users/follow")
+                .header("X-User-Id", "68045526dffe6e2de223e55b")
+                //.contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(createFollowRequest)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        Mockito.verify(followRestMapper, times(1)).toFollow(anyString(), any(CreateFollowRequest.class));
+        Mockito.verify(followInputPort, times(1)).followUser(any(Follow.class));
     }
 
 

@@ -135,4 +135,34 @@ class UserPersistenceAdapterTest {
         Mockito.verify(userReactiveRepository, times(1)).findAllById(anyIterable());
         Mockito.verify(userPersistenceMapper, times(1)).toUsers(any(Flux.class));
     }
+
+    @Test
+    @DisplayName("When UserId Exists Expect Verify User By UserId Return True")
+    void When_UserIdExists_Expect_VerifyUserByUserId_ReturnTrue() {
+        when(userReactiveRepository.existsByUserIdIgnoreCase(anyString())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = userPersistenceAdapter.verifyUserByUserId("testUserId");
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).existsByUserIdIgnoreCase(anyString());
+    }
+
+    @Test
+    @DisplayName("When UserIdIsCorrect Expect Find By UserId Return User Information")
+    void When_UserIdIsCorrect_Expect_FindByUserId_ReturnUserInformation() {
+        when(userReactiveRepository.findByUserId(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserEntityMock()));
+        when(userPersistenceMapper.toUser(any(UserEntity.class))).thenReturn(TestUtilUser.buildUserMock());
+
+        Mono<User> result = userPersistenceAdapter.findByUserId("testUserId");
+
+        StepVerifier.create(result)
+                .expectNext(TestUtilUser.buildUserMock())
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).findByUserId(anyString());
+        Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
+    }
 }

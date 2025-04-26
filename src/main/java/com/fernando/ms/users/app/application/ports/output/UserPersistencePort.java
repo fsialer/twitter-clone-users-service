@@ -12,4 +12,6 @@ public interface UserPersistencePort {
     Mono<Void> delete(String id);
     Mono<Boolean> verifyUser(String id);
     Flux<User> findByIds(Iterable<String> id);
+    Mono<Boolean> verifyUserByUserId(String id);
+    Mono<User> findByUserId(String userId);
 }
