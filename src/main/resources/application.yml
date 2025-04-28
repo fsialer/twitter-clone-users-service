@@ -16,3 +16,8 @@ spring:
         connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:TEST_CONNECTION_STRING}
         queue-name: ${AZURE_SERVICE_BUS_QUEUE_NAME:queue_user}
         entity-type: queue
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info

@@ -21,6 +21,7 @@ AZURE_SERVICE_BUS_QUEUE_NAME=*****
 ## Tabla de recursos
 | NOMBRE                    | RUTA                    | PETICION | PARAMETROS                                          | CUERPO                                                                           | 
 |---------------------------|-------------------------|----------|-----------------------------------------------------|----------------------------------------------------------------------------------|
+| Actuator                  | /actuator       | GET      | NINGUNO     | NINGUNO                                                                      |
 | Listar usuarios           | /v1/users               | GET      | NINGUNO                                             | NINGUNO                                                                          |
 | Obtener usuario por id    | /v1/users/{id}          | GET      | NINGUNO                                             | NINGUNO                                                                          |
 | Crear usuario             | /v1/users               | POST     | NINGUNO                                             | {<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>"userId":"cde8c071a420424abf2"<br/>} |
