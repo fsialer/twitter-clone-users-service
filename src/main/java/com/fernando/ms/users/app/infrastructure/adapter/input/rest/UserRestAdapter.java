@@ -116,4 +116,13 @@ public class UserRestAdapter{
         return userInputPort.findByUserId(userId)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
+
+    @PutMapping("/me")
+    @Operation(summary = "Update profile user authenticated")
+    @ApiResponse(responseCode = "200", description = "Updated profile user authenticated")
+    public Mono<ResponseEntity<UserResponse>> updateByUserId(@RequestHeader("X-User-Id") String userId,
+                                                                 @Valid @RequestBody UpdateUserRequest rq){
+        return userInputPort.updateByUserId(userId,userRestMapper.toUser(rq))
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
+    }
 }

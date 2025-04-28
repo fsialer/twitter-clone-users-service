@@ -260,4 +260,26 @@ class UserRestAdapterTest {
         Mockito.verify(userRestMapper,times(1)).toUserResponse(any(User.class));
     }
 
+    @Test
+    @DisplayName("When User Authenticated Is Correct Expect User Information Updated Successfully")
+    void When_UserAuthenticatedIsCorrect_Expect_UserInformationUpdatedSuccessfully() throws JsonProcessingException {
+        when(userRestMapper.toUser(any(UpdateUserRequest.class))).thenReturn( TestUtilUser.buildUserMock());
+        when(userInputPort.updateByUserId(anyString(),any(User.class))).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn( TestUtilUser.buildUserResponseMock());
+
+        webTestClient.put()
+                .uri("/v1/users/me")
+                .header("X-User-Id", "4f57f5d4f668d4ff5")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildUpdateUserRequestMock()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+
+        Mockito.verify(userRestMapper, times(1)).toUser(any(UpdateUserRequest.class));
+        Mockito.verify(userInputPort, times(1)).updateByUserId(anyString(),any(User.class));
+        Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
+    }
 }

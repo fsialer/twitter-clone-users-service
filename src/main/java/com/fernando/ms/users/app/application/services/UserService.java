@@ -79,4 +79,26 @@ public class UserService implements UserInputPort {
     public Mono<User> findByUserId(String userId) {
         return userPersistencePort.findByUserId(userId).switchIfEmpty(Mono.error(UserNotFoundException::new));
     }
+
+    @Override
+    public Mono<User> updateByUserId(String userId, User user) {
+        return userPersistencePort.findByUserId(userId)
+                .switchIfEmpty(Mono.error(UserNotFoundException::new))
+                .flatMap(userInfo->{
+                    userInfo.setNames(user.getNames());
+                    userInfo.setLastNames(user.getLastNames());
+                    return Mono.just(userInfo)
+                            .filter(user1 -> !user1.getEmail().equals(user.getEmail()))
+                            .flatMap(user1-> userPersistencePort.existsByEmail(user.getEmail())
+                                    .flatMap(existByEmail-> {
+                                        if (Boolean.TRUE.equals(existByEmail)) {
+                                            return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
+                                        }
+                                        user1.setEmail(user.getEmail());
+                                        return userPersistencePort.save(user1);
+                                    })
+                            )
+                            .defaultIfEmpty(userInfo);
+                });
+    }
 }
