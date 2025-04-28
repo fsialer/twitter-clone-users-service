@@ -86,4 +86,10 @@ public class UserRestAdapter{
                                     @PathVariable("id") String id){
         return followInputPort.unFollowUser(id,userId);
     }
+
+    @GetMapping("/me")
+    public Mono<ResponseEntity<UserResponse>> findByUserId(@RequestHeader("X-User-Id") String userId){
+        return userInputPort.findByUserId(userId)
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
+    }
 }

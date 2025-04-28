@@ -17,7 +17,7 @@ public class TestUtilUser {
         return User.builder()
                 .id("cde8c071a420424abf28b189ae2cd6982")
                 .names("Fernando")
-                .lastNames("Sialer")
+                .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .userId("4f57f5d4f668d4ff5")
                 .build();
@@ -27,7 +27,7 @@ public class TestUtilUser {
         return UserEntity.builder()
                 .id("cde8c071a420424abf28b189ae2cd6982")
                 .names("Fernando")
-                .lastNames("Sialer")
+                .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .userId("4f57f5d4f668d4ff5")
                 .createdAt(LocalDateTime.now())

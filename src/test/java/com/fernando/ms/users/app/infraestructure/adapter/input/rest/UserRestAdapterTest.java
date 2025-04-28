@@ -74,7 +74,7 @@ class UserRestAdapterTest {
     @DisplayName("When UserIdentifier Is Correct Expect User Information Successfully")
     void When_UserIdentifierIsCorrect_Expect_UserInformationSuccessfully() {
      when(userInputPort.findById(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
-     when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.just( TestUtilUser.buildUserResponseMock()));
+     when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
      webTestClient.get()
              .uri("/v1/users/{id}","1L")
              .exchange()
@@ -83,7 +83,7 @@ class UserRestAdapterTest {
              .jsonPath("$.names").isEqualTo("Fernando")
              .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
         Mockito.verify(userInputPort,times(1)).findById(anyString());
-        Mockito.verify(userRestMapper,times(1)).toUserResponse(any(Mono.class));
+        Mockito.verify(userRestMapper,times(1)).toUserResponse(any(User.class));
     }
 
 
@@ -221,7 +221,7 @@ class UserRestAdapterTest {
         webTestClient.post()
                 .uri("/v1/users/follow")
                 .header("X-User-Id", "68045526dffe6e2de223e55b")
-                //.contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(createFollowRequest)
                 .exchange()
                 .expectStatus().isNoContent();
@@ -243,5 +243,21 @@ class UserRestAdapterTest {
         verify(followInputPort, times(1)).unFollowUser("followId123", "userId123");
     }
 
+    @Test
+    @DisplayName("When UserAuthenticate Is Correct Expect User Information Successfully")
+    void When_UserAuthenticateIsCorrect_Expect_UserInformationSuccessfully() {
+        when(userInputPort.findByUserId(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
+        webTestClient.get()
+                .uri("/v1/users/me")
+                .header("X-User-Id", "4f57f5d4f668d4ff5")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+        Mockito.verify(userInputPort,times(1)).findByUserId(anyString());
+        Mockito.verify(userRestMapper,times(1)).toUserResponse(any(User.class));
+    }
 
 }

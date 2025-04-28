@@ -74,4 +74,9 @@ public class UserService implements UserInputPort {
     public Flux<User> findByIds(Iterable<String> ids) {
         return userPersistencePort.findByIds(ids);
     }
+
+    @Override
+    public Mono<User> findByUserId(String userId) {
+        return userPersistencePort.findByUserId(userId).switchIfEmpty(Mono.error(UserNotFoundException::new));
+    }
 }

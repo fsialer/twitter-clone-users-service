@@ -218,4 +218,26 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort, times(1)).findByIds(anyIterable());
     }
+
+    @Test
+    @DisplayName("When User Authenticate Is Correct Except User Information Correct")
+    void When_UserAuthenticateIsCorrect_Except_UserInformationCorrect(){
+        when(userPersistencePort.findByUserId(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        Mono<User> userMono=userService.findByUserId("cde8c071a420424abf28b189ae2cd698");
+        StepVerifier.create(userMono)
+                .expectNext(TestUtilUser.buildUserMock())
+                .verifyComplete();
+        Mockito.verify(userPersistencePort,times(1)).findByUserId(anyString());
+    }
+
+    @Test
+    @DisplayName("Expect UserNotFoundException When User Authenticate Is Invalid")
+    void Expect_UserNotFoundException_When_UserAuthenticateIsInvalid(){
+        when(userPersistencePort.findByUserId(anyString())).thenReturn(Mono.empty());
+        Mono<User> userMono=userService.findByUserId("cde8c071a420424abf28b189ae2cd698");
+        StepVerifier.create(userMono)
+                .expectError(UserNotFoundException.class)
+                .verify();
+        Mockito.verify(userPersistencePort,times(1)).findByUserId(anyString());
+    }
 }

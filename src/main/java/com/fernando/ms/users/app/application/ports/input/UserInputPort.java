@@ -12,5 +12,6 @@ public interface UserInputPort {
     Mono<Void> delete(String id);
     Mono<Boolean> verifyUser(String id);
     Flux<User> findByIds(Iterable<String> ids);
+    Mono<User> findByUserId(String userId);
 }
    
