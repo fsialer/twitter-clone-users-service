@@ -11,5 +11,10 @@
 * Unfollow user
 * Get information user authenticated
 * Update information user authenticated
+* Add actuator
+* Add Dockerfile
+* Add workflow for build image
+* Add monitoring with prometheus
+* Add swagger for documentation
 ### 📄 Documentation
 * create README.md & CHANGELOG.md
