@@ -56,6 +56,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.2'
 	implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
+	implementation 'com.azure:azure-messaging-servicebus:7.15.0'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
