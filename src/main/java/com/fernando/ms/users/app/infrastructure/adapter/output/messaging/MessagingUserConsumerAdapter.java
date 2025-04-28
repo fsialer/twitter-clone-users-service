@@ -36,8 +36,8 @@ public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
 
     private void startListening() {
         receiverClient.receiveMessages()
+                .doOnNext(user->log.info("Received message: {}", user.getBody().toString()))
                 .map(this::convertMessageToUser)
-                .doOnNext(user->log.info("Received message: {}", user.getEmail()))
                 .doOnNext(userSink::tryEmitNext)
                 .doOnComplete(this::close)
                 .subscribe();
