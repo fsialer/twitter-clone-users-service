@@ -31,3 +31,16 @@ management:
     export:
       prometheus:
         enabled: true
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    url: /v3/api-docs
+  openapi:
+    info:
+      title: Twitter Clone Users Service API
+      version: 1.0.0
+      description: API documentation for the Twitter Clone Users Service

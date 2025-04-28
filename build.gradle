@@ -59,6 +59,7 @@ dependencies {
 	implementation 'com.azure:azure-messaging-servicebus:7.15.0'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation "io.micrometer:micrometer-registry-prometheus"
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.6'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
