@@ -1,0 +1,46 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: twitter-clone-users-service
+  jackson:
+    default-property-inclusion: NON_NULL
+  data:
+    mongodb:
+      uri: ${DB_HOST:mongodb://localhost:27017/tc_users_db?authSource=admin}
+      username: ${DB_USERNAME:root}
+      password: ${DB_PASSWORD:1234}
+  cloud:
+    azure:
+      servicebus:
+        connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:TEST_CONNECTION_STRING}
+        queue-name: ${AZURE_SERVICE_BUS_QUEUE_NAME:queue_user}
+        entity-type: queue
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    enable:
+      jvm: true
+      logback: true
+    export:
+      prometheus:
+        enabled: true
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    url: /v3/api-docs
+  openapi:
+    info:
+      title: Twitter Clone Users Service API
+      version: 1.0.0
+      description: API documentation for the Twitter Clone Users Service
