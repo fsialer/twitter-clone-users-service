@@ -1,3 +1,6 @@
+## [v1.0.1] - 2025-04-28
+* bugfix: It cannot update the user authenticated
+* bugfix: It cannot update the user by id
 ## [v1.0.0] - 2025-04-28
 ### 🚀 Features
 * Get users created

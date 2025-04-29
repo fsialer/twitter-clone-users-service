@@ -111,7 +111,7 @@ public class UserRestAdapter{
 
     @GetMapping("/me")
     @Operation(summary = "Find user authenticated")
-    @ApiResponse(responseCode ="204", description = "Found user authenticated")
+    @ApiResponse(responseCode ="200", description = "Found user authenticated")
     public Mono<ResponseEntity<UserResponse>> findByUserId(@RequestHeader("X-User-Id") String userId){
         return userInputPort.findByUserId(userId)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));

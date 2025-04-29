@@ -118,6 +118,25 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("When User Information Is Correct Expect User Information Updated Successfully")
+    void When_UserInformationEmailIsSame_Expect_UserInformationUpdatedSuccessfully() {
+        User updatedUser = TestUtilUser.buildUserMock();
+
+        when(userPersistencePort.findById(anyString())).thenReturn(Mono.just( TestUtilUser.buildUserMock()));
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
+
+        Mono<User> result = userService.update("cde8c071a420424abf28b189ae2cd698", updatedUser);
+
+        StepVerifier.create(result)
+                .expectNext(updatedUser)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findById(anyString());
+        Mockito.verify(userPersistencePort, never()).existsByEmail(anyString());
+        Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
+    }
+
+    @Test
     @DisplayName("Expect UserNotFoundException When User Identifier Does Not Exists")
     void Expect_UserNotFoundException_When_UserIdentifierDoesNotExists() {
         User updatedUser = TestUtilUser.buildUserMock();
@@ -282,6 +301,25 @@ class UserServiceTest {
 
         Mockito.verify(userPersistencePort, times(1)).findByUserId(anyString());
         Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
+        Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("When User Authenticated Email Same Is Correct Expect User Information Updated Successfully")
+    void When_UserAuthenticatedEmailSame_Expect_UserInformationUpdatedSuccessfully() {
+        User updatedUser = TestUtilUser.buildUserMock();
+
+        when(userPersistencePort.findByUserId(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userPersistencePort.save(any(User.class))).thenReturn(Mono.just(updatedUser));
+
+        Mono<User> result = userService.updateByUserId("cde8c071a420424abf28b189ae2cd698", updatedUser);
+
+        StepVerifier.create(result)
+                .expectNext(updatedUser)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findByUserId(anyString());
+        Mockito.verify(userPersistencePort,never()).existsByEmail(anyString());
         Mockito.verify(userPersistencePort, times(1)).save(any(User.class));
     }
 
