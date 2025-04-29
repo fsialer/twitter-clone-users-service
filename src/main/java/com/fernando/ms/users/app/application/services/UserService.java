@@ -54,7 +54,7 @@ public class UserService implements UserInputPort {
                                         return userPersistencePort.save(user1);
                                     })
                             )
-                            .defaultIfEmpty(userInfo);
+                            .switchIfEmpty(Mono.defer(()->userPersistencePort.save(userInfo)));
                 });
     }
 
@@ -98,7 +98,7 @@ public class UserService implements UserInputPort {
                                         return userPersistencePort.save(user1);
                                     })
                             )
-                            .defaultIfEmpty(userInfo);
+                            .switchIfEmpty(Mono.defer(()->userPersistencePort.save(userInfo)));
                 });
     }
 }
