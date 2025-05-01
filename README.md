@@ -22,7 +22,7 @@ AZURE_SERVICE_BUS_QUEUE_NAME=*****
 | NOMBRE                         | RUTA                    | PETICION | PARAMETROS                                             | CUERPO                                                                                                                | 
 |--------------------------------|-------------------------|----------|--------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | Actuator                       | /actuator               | GET      | NINGUNO                                                | NINGUNO                                                                                                               |
-| Documentacion                  | /swagger-ui/index.html  | GET      | NINGUNO    | NINGUNO                                                                                                                                      |
+| Documentacion                  | /swagger-ui/index.html  | GET      | NINGUNO    | NINGUNO                                                                                                               |
 | Listar usuarios                | /v1/users               | GET      | NINGUNO                                                | NINGUNO                                                                                                               |
 | Obtener usuario por id         | /v1/users/{id}          | GET      | NINGUNO                                                | NINGUNO                                                                                                               |
 | Crear usuario                  | /v1/users               | POST     | NINGUNO                                                | {<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>"userId":"cde8c071a420424abf2"<br/>} |
@@ -33,7 +33,7 @@ AZURE_SERVICE_BUS_QUEUE_NAME=*****
 | Seguir usuario                 | /v1/users/follow        | POST     |                                                        | {<br/>"followedId":"cde8c071a420424abf28b189ae2cd6982",<br/>}                                                         |
 | Dejar de seguir a usuario      | /v1/users/unfollow/{id} | DELETE   |                                                        |                                                                                                                       |
 | Obtener usuario autenticado    | /v1/users/me            | GET      | NINGUNO                                                | NINGUNO                                                                                                               |
-| Actualizar usuario autenticado | /v1/users/me            | PUT      | NINGUNO                                                | {<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>}                                                                                                                |
+| Actualizar usuario autenticado | /v1/users/me            | PUT      | NINGUNO                                                | {<br/>"names":"Jhon"<br/>"lastNames":"Doe"<br/>"email":"jhondoe@example.com"<br/>}                                    |
 
 ## Stack
 * SPRING BOOT
@@ -48,6 +48,8 @@ AZURE_SERVICE_BUS_QUEUE_NAME=*****
 * ACTUATOR
 * PROMETHEUS
 * SWAGGER
+* GITHUB ACTIONS
 
 ## Referencias
 * [Azure Services Bus](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview)
+* [Changelog](https://github.com/fsialer/twitter-clone-users-service/blob/main/CHANGELOG.md)

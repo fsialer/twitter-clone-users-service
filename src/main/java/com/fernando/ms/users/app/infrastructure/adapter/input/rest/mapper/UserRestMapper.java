@@ -8,7 +8,6 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.respon
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserRestMapper {
@@ -19,16 +18,8 @@ public interface UserRestMapper {
 
     UserResponse toUserResponse(User user);
 
-    default  Mono<UserResponse> toUserResponse(Mono<User> user){
-        return user.map(this::toUserResponse);
-    }
-
     User toUser(CreateUserRequest rq);
     User toUser(UpdateUserRequest rq);
-
-
-
-    //UserResponse toUserResponse(User user);
 
     default ExistsUserResponse toExistsUserResponse(Boolean exists){
         return ExistsUserResponse.builder()

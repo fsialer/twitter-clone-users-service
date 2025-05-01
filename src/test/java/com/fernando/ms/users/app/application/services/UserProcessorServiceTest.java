@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserProcessorServiceTest {
+class UserProcessorServiceTest {
     @Mock
     private UserPersistencePort userPersistencePort;
 

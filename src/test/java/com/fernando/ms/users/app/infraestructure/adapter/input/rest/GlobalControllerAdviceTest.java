@@ -32,7 +32,6 @@ import static org.mockito.Mockito.*;
 @WebFluxTest({UserRestAdapter.class})
 class GlobalControllerAdviceTest {
 
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -56,7 +55,6 @@ class GlobalControllerAdviceTest {
     @DisplayName("Expect UserNotFoundException When User Identifier Is Invalid")
     void Expect_UserNotFoundException_When_UserIdentifierIsInvalid() {
         when(userInputPort.findById(anyString())).thenReturn(Mono.error(new UserNotFoundException()));
-        when(userRestMapper.toUserResponse(any(Mono.class))).thenReturn(Mono.empty());
         webTestClient.get()
                 .uri("/v1/users/{id}","cde8c071a420424abf28b189ae2cd698")
                 .exchange()
@@ -66,6 +64,8 @@ class GlobalControllerAdviceTest {
                     assert response.getCode().equals(ErrorCatalog.USER_NOT_FOUND.getCode());
                     assert response.getMessage().equals(ErrorCatalog.USER_NOT_FOUND.getMessage());
                 });
+        Mockito.verify(userInputPort, times(1)).findById(anyString());
+        Mockito.verify(userRestMapper,never()).toUserResponse(any());
     }
 
     @Test
@@ -82,6 +82,7 @@ class GlobalControllerAdviceTest {
                     assert response.getCode().equals(ErrorCatalog.INTERNAL_SERVER_ERROR.getCode());
                     assert response.getMessage().equals(ErrorCatalog.INTERNAL_SERVER_ERROR.getMessage());
                 });
+        Mockito.verify(userInputPort, never()).findById(anyString());
     }
 
     @Test
@@ -103,6 +104,8 @@ class GlobalControllerAdviceTest {
                     assert response.getMessage().equals(ErrorCatalog.USER_EMAIL_USER_ALREADY_EXISTS.getMessage());
                     assert response.getDetails().contains("User email: "+createUserRequest.getEmail()+" already exists!");
                 });
+        Mockito.verify(userRestMapper, times(1)).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userInputPort, times(1)).save(any());
     }
 
 
@@ -122,6 +125,8 @@ class GlobalControllerAdviceTest {
                     assert response.getCode().equals(ErrorCatalog.USER_BAD_PARAMETERS.getCode());
                     assert response.getMessage().equals(ErrorCatalog.USER_BAD_PARAMETERS.getMessage());
                 });
+        Mockito.verify(userRestMapper, never()).toUser(any(CreateUserRequest.class));
+        Mockito.verify(userInputPort, never()).save(any());
     }
 
 
