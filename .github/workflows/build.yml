@@ -47,11 +47,11 @@ jobs:
                 -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
                 -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
       - name: Wait for Quality Gate result
+        id: sonarqube-quality-gate-check.outputs
         uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-          organization: ${{ secrets.SONAR_ORG }}
-          sonarToken: ${{ secrets.SONAR_TOKEN }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Show SonarQube Quality Gate Status value
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
