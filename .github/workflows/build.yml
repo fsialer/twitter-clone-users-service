@@ -35,7 +35,7 @@ jobs:
       - name: Build Spring Boot application
         run: ./gradlew clean build -x test
 
-      - name: jacoco
+      - name: Run Test Jacoco
         run: ./gradlew clean test jacocoTestReport
 
       - name: Run Sonarqube analysis
@@ -45,16 +45,6 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORG }}
-
-#      - name: Run SonarCloud analysis
-#        uses: SonarSource/sonarcloud-github-action@master
-#        with:
-#          args: >
-#            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-#            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-#            -Dsonar.host.url=https://sonarcloud.io
-#            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-#            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
 
       - name: Wait for Quality Gate status
         run: |
@@ -68,7 +58,6 @@ jobs:
               echo "Quality Gate Failed"
               exit 1
             fi
-
 
   build-and-push:
     runs-on: ubuntu-latest
