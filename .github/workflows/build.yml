@@ -47,7 +47,7 @@ jobs:
                 -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
                 -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
       - name: Wait for Quality Gate result
-        id: sonarqube-quality-gate-check.outputs
+        id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
