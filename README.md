@@ -49,7 +49,7 @@ AZURE_SERVICE_BUS_QUEUE_NAME=*****
 * PROMETHEUS
 * SWAGGER
 * GITHUB ACTIONS
-* Sonarqube
+* SONARQUBE
 
 ## Referencias
 * [Azure Services Bus](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview)
