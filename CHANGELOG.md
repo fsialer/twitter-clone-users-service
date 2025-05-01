@@ -1,3 +1,6 @@
+## [v1.0.2] - 2025-05-01
+### 🔧 Refactor
+* refactor workflow build image docker adding sonarcloud for quality code
 ## [v1.0.1] - 2025-04-28
 ### 🐛 Bug
 * bugfix: It cannot update the user authenticated
