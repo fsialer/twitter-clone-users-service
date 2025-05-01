@@ -44,7 +44,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORG }}
 
 #      - name: Run SonarCloud analysis
 #        uses: SonarSource/sonarcloud-github-action@master
