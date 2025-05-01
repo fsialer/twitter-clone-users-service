@@ -45,6 +45,7 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORG }}
+          SONAR_BRANCH_NAME: ${{github.ref_name}}
 
       - name: Wait for Quality Gate status
         run: |
