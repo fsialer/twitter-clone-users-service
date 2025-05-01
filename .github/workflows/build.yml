@@ -40,12 +40,11 @@ jobs:
 
       - name: SonarCloud Scan
         run: |
-            ./gradlew sonarqube \
+            ./gradlew sonar \
                 -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
                 -Dsonar.organization=${{ secrets.SONAR_ORG }} \
                 -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
                 -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-                -Dsonar.branch.name=${{ github.ref_name }} \
                 -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
       - name: Wait for Quality Gate result
         uses: sonarsource/sonarqube-quality-gate-action@master
