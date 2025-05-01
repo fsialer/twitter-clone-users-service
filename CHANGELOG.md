@@ -1,3 +1,6 @@
+## [v1.0.3] - 2025-05-01
+### 🔧 Refactor
+* refactor code in consumer for message broker
 ## [v1.0.2] - 2025-05-01
 ### 🔧 Refactor
 * refactor workflow build image docker adding sonarcloud for quality code

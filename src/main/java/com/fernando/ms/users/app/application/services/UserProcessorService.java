@@ -3,9 +3,10 @@ package com.fernando.ms.users.app.application.services;
 import com.fernando.ms.users.app.application.ports.input.UserProcessorInputPort;
 import com.fernando.ms.users.app.application.ports.output.MessagingUserConsumerPort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +16,7 @@ public class UserProcessorService implements UserProcessorInputPort {
     private final UserPersistencePort userPersistencePort;
     private final MessagingUserConsumerPort messagingUserConsumerPort;
 
-    @PostConstruct
-    public void startProcessor() {
-        processUser();
-    }
-
+    @EventListener(ApplicationReadyEvent.class)
     public void processUser() {
         messagingUserConsumerPort.receiveUsers()
                 .flatMap(user -> userPersistencePort.save(user)
