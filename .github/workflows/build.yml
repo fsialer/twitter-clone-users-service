@@ -46,7 +46,7 @@ jobs:
                 -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
                 -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
                 -Dsonar.branch.name=${{ github.ref_name }} \
-                -Dsonar.coverage.jacoco.xmlReportPaths= build/reports/jacoco/test/jacocoTestReport.xml
+                -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
       - name: Wait for Quality Gate result
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
