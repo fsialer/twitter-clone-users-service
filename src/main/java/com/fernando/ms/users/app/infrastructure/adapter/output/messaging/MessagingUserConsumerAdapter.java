@@ -1,17 +1,16 @@
 package com.fernando.ms.users.app.infrastructure.adapter.output.messaging;
 
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverAsyncClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fernando.ms.users.app.application.ports.output.MessagingUserConsumerPort;
 import com.fernando.ms.users.app.domain.models.User;
-import com.fernando.ms.users.app.infrastructure.config.ServiceBusProperties;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -20,20 +19,10 @@ import reactor.core.publisher.Sinks;
 @RequiredArgsConstructor
 @Slf4j
 public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
-    private ServiceBusReceiverAsyncClient  receiverClient;
+    private final ServiceBusReceiverAsyncClient  receiverClient;
     private final Sinks.Many<User> userSink;
-    private final ServiceBusProperties serviceBusProperties;
 
-    @PostConstruct
-    public void init() {
-        receiverClient = new ServiceBusClientBuilder()
-                .connectionString(serviceBusProperties.getConnectionString())
-                .receiver()
-                .queueName(serviceBusProperties.getQueueName())
-                .buildAsyncClient();
-        startListening();
-    }
-
+    @EventListener(ApplicationReadyEvent.class)
     private void startListening() {
         receiverClient.receiveMessages()
                 .doOnNext(user->log.info("Received message: {}", user.getBody().toString()))
@@ -43,7 +32,7 @@ public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
                 .subscribe();
     }
 
-    public void close() {
+    private void close() {
         if (receiverClient != null) {
             receiverClient.close();
         }
