@@ -19,8 +19,13 @@ jacoco {
 	toolVersion = "0.8.10"
 }
 
+
 sonar {
 	properties {
+		property("sonar.projectKey", "${SONAR_PROJECT_KEY}")
+		property("sonar.organization", "${SONAR_ORGANIZATION}")
+		property("sonar.host.url", "${SONAR_HOST_URL}")
+		property("sonar.token", "${SONAR_TOKEN}")
 		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
 	}
 }
