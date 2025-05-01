@@ -19,6 +19,13 @@ jacoco {
 	toolVersion = "0.8.10"
 }
 
+sonar {
+	properties {
+		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+	}
+}
+
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
