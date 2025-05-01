@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.fernando.ms.users.app'
-version = '1.0.1'
+version = '1.0.2'
 
 java {
 	toolchain {
@@ -22,20 +22,11 @@ jacoco {
 
 sonar {
 	properties {
-		property("sonar.projectKey", "${SONAR_NAME_PROJECT}")
-		property("sonar.organization", "${SONAR_ORGANIZATION}")
-		property("sonar.host.url", "${SONAR_HOST}")
-		property("sonar.login", "${SONAR_KEY}")
-		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.html"
-		property "sonar.exclusions",
-				"**/com/fernando/ms/users/app/domain/**, " +
-						"**/com/fernando/ms/users/app/infrastructure/adapter/utils/**, " +
-						"**/com/fernando/ms/users/app/infrastructure/adapter/input/rest/models/enums/**," +
-						"**/com/fernando/ms/users/app/infrastructure/adapter/input/rest/GlobalControllerAdvice.java,"+
-						"**/com/fernando/ms/users/app/infrastructure/adapter/input/rest/**,"+
-						"**/com/fernando/ms/users/app/infrastructure/adapter/output/persistence/mapper/**,"+
-						"**/com/fernando/ms/users/app/infrastructure/adapter/output/persistence/models/**,"+
-						"**/com/fernando/ms/users/app/TwitterCloneUsersServiceApplication.java"
+		property("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY"))
+		property("sonar.organization", System.getenv("SONAR_ORGANIZATION"))
+		property("sonar.host.url", System.getenv("SONAR_HOST_URL"))
+		property("sonar.token", System.getenv("SONAR_TOKEN"))
+		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
 	}
 }
 
@@ -76,7 +67,7 @@ tasks.named('test') {
 tasks.jacocoTestReport {
 	reports {
 		xml.required = true  // Necesario para SonarQube
-		html.required = true
+		html.required = false
 		csv.required = false
 	}
 }

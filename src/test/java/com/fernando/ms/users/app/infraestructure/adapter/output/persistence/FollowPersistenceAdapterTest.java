@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class FollowPersistenceAdapterTest {
+class FollowPersistenceAdapterTest {
 
     @Mock
     private FollowRepository followRepository;
