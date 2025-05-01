@@ -48,11 +48,14 @@ jobs:
                 -Dsonar.branch.name=${{ github.ref_name }} \
                 -Dsonar.coverage.jacoco.xmlReportPaths= build/reports/jacoco/test/jacocoTestReport.xml
       - name: Wait for Quality Gate result
-        uses: SonarSource/sonarcloud-quality-gate-action@v1.1.0
+        uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
           organization: ${{ secrets.SONAR_ORG }}
           sonarToken: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Show SonarQube Quality Gate Status value
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
 
   build-and-push:
     runs-on: ubuntu-latest
