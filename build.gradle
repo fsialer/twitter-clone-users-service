@@ -71,6 +71,15 @@ tasks.jacocoTestReport {
 		html.required = false
 		csv.required = false
 	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect { fileTree(dir: it, exclude: [
+				'**/config/**',
+				'**/*Config.class',
+				'**/*Configuration.class',
+				"**/*MapperImpl.class",
+				"**/TwitterCloneUsersServiceApplication.class"
+		]) }))
+	}
 }
 
 tasks.test {

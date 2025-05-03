@@ -23,7 +23,7 @@ public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
     private final Sinks.Many<User> userSink;
 
     @EventListener(ApplicationReadyEvent.class)
-    private void startListening() {
+    public void startListening() {
         receiverClient.receiveMessages()
                 .doOnNext(user->log.info("Received message: {}", user.getBody().toString()))
                 .map(this::convertMessageToUser)
@@ -33,9 +33,7 @@ public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
     }
 
     private void close() {
-        if (receiverClient != null) {
-            receiverClient.close();
-        }
+        receiverClient.close();
     }
 
     private User convertMessageToUser(ServiceBusReceivedMessage message) {
