@@ -15,5 +15,4 @@ public class ServicesBusConfig {
                 .queueName(serviceBusProperties.getQueueName())
                 .buildAsyncClient();
     }
-
 }
