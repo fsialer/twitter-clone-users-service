@@ -14,6 +14,9 @@ import org.mapstruct.factory.Mappers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDate;
+import java.time.Month;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,6 +40,8 @@ class UserRestMapperTest {
                     assertEquals("Fernando", userResponse.getNames());
                     assertEquals("Sialer Ayala", userResponse.getLastNames());
                     assertEquals("asialer05@hotmail.com", userResponse.getEmail());
+                    assertEquals("MALE", userResponse.getSex());
+                    assertEquals(LocalDate.of(1991, Month.JANUARY,5), userResponse.getBirth());
                 })
                 .verifyComplete();
     }
@@ -51,6 +56,8 @@ class UserRestMapperTest {
         assertEquals("Fernando", userResponse.getNames());
         assertEquals("Sialer Ayala", userResponse.getLastNames());
         assertEquals("asialer05@hotmail.com", userResponse.getEmail());
+        assertEquals("MALE", userResponse.getSex());
+        assertEquals(LocalDate.of(1991, Month.JANUARY,5), userResponse.getBirth());
     }
 
     @Test
@@ -73,6 +80,8 @@ class UserRestMapperTest {
         assertEquals("Fernando", user.getNames());
         assertEquals("Sialer Ayala", user.getLastNames());
         assertEquals("asialer05@hotmail.com", user.getEmail());
+        assertEquals("MALE", user.getSex());
+        assertEquals(LocalDate.of(1991, Month.JANUARY,5), user.getBirth());
     }
 
     @Test

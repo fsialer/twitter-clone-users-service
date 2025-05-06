@@ -2,6 +2,8 @@ package com.fernando.ms.users.app.domain.models;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class User {
     private String lastNames;
     private String email;
     private String userId;
+    private LocalDate birth;
+    private String sex;
 }

@@ -28,7 +28,7 @@ sonar {
 		property("sonar.token", System.getenv("SONAR_TOKEN"))
 		property("sonar.branch.name", System.getenv("SONAR_BRANCH_NAME"))
 		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-		property "sonar.exclusions", "**/config/**"
+		property "sonar.exclusions", "**/config/**, **/TwitterCloneUsersServiceApplication.*, **/validation/*.*"
 	}
 }
 
@@ -78,7 +78,8 @@ tasks.jacocoTestReport {
 				'**/*Config.class',
 				'**/*Configuration.class',
 				"**/*MapperImpl.class",
-				"**/TwitterCloneUsersServiceApplication.class"
+				"**/TwitterCloneUsersServiceApplication.*",
+				"**/validation/*.*"
 		]) }))
 	}
 }

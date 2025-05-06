@@ -2,7 +2,7 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.respo
 
 import lombok.*;
 
-import java.util.Objects;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,4 +15,6 @@ public class UserResponse {
     private String names;
     private String lastNames;
     private String email;
+    private String sex;
+    private LocalDate birth;
 }
