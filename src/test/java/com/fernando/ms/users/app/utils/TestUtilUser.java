@@ -7,7 +7,9 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.respon
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 
 public class TestUtilUser {
 
@@ -18,6 +20,8 @@ public class TestUtilUser {
                 .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .userId("4f57f5d4f668d4ff5")
+                .birth(LocalDate.of(1991, Month.JANUARY,5))
+                .sex("MALE")
                 .build();
     }
 
@@ -28,6 +32,8 @@ public class TestUtilUser {
                 .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
                 .userId("4f57f5d4f668d4ff5")
+                .birth(LocalDate.of(1991, Month.JANUARY,5))
+                .sex("MALE")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -39,6 +45,8 @@ public class TestUtilUser {
                 .names("Fernando")
                 .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
+                .birth(LocalDate.of(1991, Month.JANUARY,5))
+                .sex("MALE")
                 .build();
     }
 
@@ -56,6 +64,8 @@ public class TestUtilUser {
                 .names("Fernando")
                 .lastNames("Sialer Ayala")
                 .email("asialer05@hotmail.com")
+                .birth(LocalDate.of(1991, Month.JANUARY,5))
+                .sex("MALE")
                 .build();
     }
 

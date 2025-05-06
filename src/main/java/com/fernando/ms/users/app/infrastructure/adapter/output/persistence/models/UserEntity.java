@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,6 +23,8 @@ public class UserEntity {
     @Indexed
     private String email;
     private String userId;
+    private LocalDate birth;
+    private String sex;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
