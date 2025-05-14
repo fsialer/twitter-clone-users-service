@@ -125,4 +125,11 @@ public class UserRestAdapter{
         return userInputPort.updateByUserId(userId,userRestMapper.toUser(rq))
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
+
+    @GetMapping("/{userId}/followed")
+    @Operation(summary = "Find all Followed by user authenticated")
+    @ApiResponse(responseCode = "200", description = "List user followed")
+    public Flux<UserResponse> findAllFollowedByUserId(@PathVariable String userId){
+        return userRestMapper.toUsersResponse(userInputPort.findUserFollowed(userId));
+    }
 }

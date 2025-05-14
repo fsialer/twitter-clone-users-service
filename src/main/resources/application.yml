@@ -13,7 +13,7 @@ spring:
   cloud:
     azure:
       servicebus:
-        connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:TEST_CONNECTION_STRING}
+        connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:CONNECTION}
         queue-name: ${AZURE_SERVICE_BUS_QUEUE_NAME:queue_user}
         entity-type: queue
 management:

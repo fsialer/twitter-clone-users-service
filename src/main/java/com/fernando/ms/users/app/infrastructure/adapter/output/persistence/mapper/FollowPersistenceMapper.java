@@ -5,6 +5,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.model
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 
@@ -17,5 +18,9 @@ public interface FollowPersistenceMapper {
 
     default LocalDateTime mapCreatedAt(){
         return LocalDateTime.now();
+    }
+
+    default Flux<Follow> toFluxFollow(Flux<FollowDocument> followDocumentFlux){
+        return followDocumentFlux.map(this::toFollow);
     }
 }

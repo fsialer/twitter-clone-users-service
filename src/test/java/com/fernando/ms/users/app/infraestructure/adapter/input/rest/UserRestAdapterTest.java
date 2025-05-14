@@ -282,4 +282,27 @@ class UserRestAdapterTest {
         Mockito.verify(userInputPort, times(1)).updateByUserId(anyString(),any(User.class));
         Mockito.verify(userRestMapper, times(1)).toUserResponse(any(User.class));
     }
+
+    @Test
+    @DisplayName("When UserId Is Correct Expect List User Correct")
+    void When_UserIdIsCorrect_Expect_ListUserCorrect() {
+        User user=TestUtilUser.buildUserMock();
+        UserResponse userResponse=TestUtilUser.buildUserResponseMock();
+        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(userResponse));
+        when(userInputPort.findUserFollowed(anyString())).thenReturn(Flux.just( user));
+        webTestClient.get()
+                .uri("/v1/users/{userId}/followed","4f57f5d4f668d4ff5")
+                //.header("X-User-Id", "4f57f5d4f668d4ff5")
+                //.contentType(MediaType.APPLICATION_JSON)
+                //.bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildUpdateUserRequestMock()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo("cde8c071a420424abf28b189ae2cd6982")
+                .jsonPath("$[0].names").isEqualTo("Fernando")
+                .jsonPath("$[0].lastNames").isEqualTo("Sialer Ayala");
+
+        Mockito.verify(userRestMapper, times(1)).toUsersResponse(any(Flux.class));
+        Mockito.verify(userInputPort, times(1)).findUserFollowed(anyString());
+    }
 }

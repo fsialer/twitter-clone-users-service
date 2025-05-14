@@ -14,5 +14,6 @@ public interface UserInputPort {
     Flux<User> findByIds(Iterable<String> ids);
     Mono<User> findByUserId(String userId);
     Mono<User> updateByUserId(String userId,User user);
+    Flux<User> findUserFollowed(String userId);
 }
    

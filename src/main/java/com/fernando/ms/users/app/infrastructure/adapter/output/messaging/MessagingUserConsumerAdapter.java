@@ -1,9 +1,8 @@
 package com.fernando.ms.users.app.infrastructure.adapter.output.messaging;
 
-import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
+import com.azure.core.util.BinaryData;
 import com.azure.messaging.servicebus.ServiceBusReceiverAsyncClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fernando.ms.users.app.application.ports.output.MessagingUserConsumerPort;
 import com.fernando.ms.users.app.domain.models.User;
 import lombok.RequiredArgsConstructor;
@@ -26,24 +25,10 @@ public class MessagingUserConsumerAdapter implements MessagingUserConsumerPort {
     public void startListening() {
         receiverClient.receiveMessages()
                 .doOnNext(user->log.info("Received message: {}", user.getBody().toString()))
-                .map(this::convertMessageToUser)
+                .map(message->BinaryData.fromString(message.getBody().toString()).toObject(User.class))
                 .doOnNext(userSink::tryEmitNext)
-                .doOnComplete(this::close)
+                .doOnComplete(receiverClient::close)
                 .subscribe();
-    }
-
-    private void close() {
-        receiverClient.close();
-    }
-
-    private User convertMessageToUser(ServiceBusReceivedMessage message) {
-        try{
-            String userJson = message.getBody().toString();
-            return new ObjectMapper().readValue(userJson, User.class);
-        }catch(Exception e){
-            log.error("An occurred error: {}", e.getMessage());
-        }
-        return null;
     }
 
     public Flux<User> receiveUsers() {
