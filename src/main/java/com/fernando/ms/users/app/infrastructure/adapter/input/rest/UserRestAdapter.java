@@ -112,7 +112,7 @@ public class UserRestAdapter{
     @GetMapping("/me")
     @Operation(summary = "Find user authenticated")
     @ApiResponse(responseCode ="200", description = "Found user authenticated")
-    public Mono<ResponseEntity<UserResponse>> findByUserId(@RequestHeader("X-User-Id") String userId){
+    public Mono<ResponseEntity<UserResponse>> me(@RequestHeader("X-User-Id") String userId){
         return userInputPort.findByUserId(userId)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
@@ -131,5 +131,13 @@ public class UserRestAdapter{
     @ApiResponse(responseCode = "200", description = "List user followed")
     public Flux<UserResponse> findAllFollowedByUserId(@PathVariable String userId){
         return userRestMapper.toUsersResponse(userInputPort.findUserFollowed(userId));
+    }
+
+    @GetMapping("/{userId}/user-id")
+    @Operation(summary = "Find user by userId")
+    @ApiResponse(responseCode ="200", description = "Found user by userId")
+    public Mono<ResponseEntity<UserResponse>> findByUserId(@PathVariable String userId){
+        return userInputPort.findByUserId(userId)
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
 }

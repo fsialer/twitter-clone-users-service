@@ -292,9 +292,6 @@ class UserRestAdapterTest {
         when(userInputPort.findUserFollowed(anyString())).thenReturn(Flux.just( user));
         webTestClient.get()
                 .uri("/v1/users/{userId}/followed","4f57f5d4f668d4ff5")
-                //.header("X-User-Id", "4f57f5d4f668d4ff5")
-                //.contentType(MediaType.APPLICATION_JSON)
-                //.bodyValue(objectMapper.writeValueAsString( TestUtilUser.buildUpdateUserRequestMock()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -304,5 +301,21 @@ class UserRestAdapterTest {
 
         Mockito.verify(userRestMapper, times(1)).toUsersResponse(any(Flux.class));
         Mockito.verify(userInputPort, times(1)).findUserFollowed(anyString());
+    }
+
+    @Test
+    @DisplayName("When User UserId Is Correct Expect User Information Successfully")
+    void When_UserUserIdIsCorrect_Expect_UserInformationSuccessfully() {
+        when(userInputPort.findByUserId(anyString())).thenReturn(Mono.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUserResponse(any(User.class))).thenReturn(TestUtilUser.buildUserResponseMock());
+        webTestClient.get()
+                .uri("/v1/users/{userId}/user-id","4f57f5d4f668d4ff5")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.names").isEqualTo("Fernando")
+                .jsonPath("$.email").isEqualTo("asialer05@hotmail.com");
+        Mockito.verify(userInputPort,times(1)).findByUserId(anyString());
+        Mockito.verify(userRestMapper,times(1)).toUserResponse(any(User.class));
     }
 }
