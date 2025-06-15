@@ -318,4 +318,29 @@ class UserRestAdapterTest {
         Mockito.verify(userInputPort,times(1)).findByUserId(anyString());
         Mockito.verify(userRestMapper,times(1)).toUserResponse(any(User.class));
     }
+
+    @Test
+    @DisplayName("When FullName Exists Expect Users Information Return Successfully")
+    void When_FullNameExists_Expect_UsersInformationReturnSuccessfully() {
+        when(userInputPort.findUserByFullName(anyString(),anyInt(),anyInt())).thenReturn(Flux.just(TestUtilUser.buildUserMock()));
+        when(userRestMapper.toUsersResponse(any(Flux.class))).thenReturn(Flux.just(TestUtilUser.buildUserResponseMock()));
+
+        webTestClient.get()
+                .uri(uriBuilder ->
+                    uriBuilder.path("/v1/users/search")
+                            .queryParam("full_name","fer")
+                            .queryParam("page",1)
+                            .queryParam("size",20)
+                            .build()
+                )
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].names").isEqualTo("Fernando")
+                .jsonPath("$[0].lastNames").isEqualTo("Sialer Ayala")
+                .jsonPath("$[0].fullName").isEqualTo("Fernando Sialer Ayala")
+                .jsonPath("$[0].email").isEqualTo("asialer05@hotmail.com");
+        Mockito.verify(userInputPort,times(1)).findUserByFullName(anyString(),anyInt(),anyInt());
+        Mockito.verify(userRestMapper,times(1)).toUsersResponse(any(Flux.class));
+    }
 }

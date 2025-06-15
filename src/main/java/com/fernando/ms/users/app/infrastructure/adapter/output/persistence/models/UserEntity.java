@@ -21,6 +21,8 @@ public class UserEntity {
     private String names;
     private String lastNames;
     @Indexed
+    private String fullName;
+    @Indexed
     private String email;
     private String userId;
     private LocalDate birth;

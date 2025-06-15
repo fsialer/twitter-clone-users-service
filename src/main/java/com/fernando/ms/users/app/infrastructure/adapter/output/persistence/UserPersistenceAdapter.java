@@ -63,5 +63,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userReactiveRepository.findByUserId(userId).map(userPersistenceMapper::toUser);
     }
 
+    @Override
+    public Flux<User> findUserByFullName(String fullName, int page, int size) {
+        return userPersistenceMapper.toUsers(userReactiveRepository.findAllByFullNamePagination(fullName,page,size));
+    }
+
 
 }

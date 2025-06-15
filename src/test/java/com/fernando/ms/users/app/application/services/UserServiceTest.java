@@ -391,4 +391,17 @@ class UserServiceTest {
         verify(followPersistencePort, times(1)).findFollowedByFollowerId(anyString());
         verify(userPersistencePort, times(1)).findByUserId(anyString());
     }
+
+    @Test
+    @DisplayName("When fullName exists Expect A List Users that match")
+    void When_FullNameExists_Expect_AListUsersThatMatch() {
+        User user= TestUtilUser.buildUserMock();
+        when(userPersistencePort.findUserByFullName(anyString(),anyInt(),anyInt())).thenReturn(Flux.just(user));
+        Flux<User> users = userService.findUserByFullName("Fernando Sialer Ayala",1,20);
+        StepVerifier.create(users)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findUserByFullName(anyString(),anyInt(),anyInt());
+    }
 }

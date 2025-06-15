@@ -14,4 +14,5 @@ public interface UserPersistencePort {
     Flux<User> findByIds(Iterable<String> id);
     Mono<Boolean> verifyUserByUserId(String id);
     Mono<User> findByUserId(String userId);
+    Flux<User> findUserByFullName(String fullName, int page, int size);
 }

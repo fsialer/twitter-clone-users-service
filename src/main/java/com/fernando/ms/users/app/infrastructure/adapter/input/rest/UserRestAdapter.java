@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -139,5 +140,14 @@ public class UserRestAdapter{
     public Mono<ResponseEntity<UserResponse>> findByUserId(@PathVariable String userId){
         return userInputPort.findByUserId(userId)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Find user by fullname")
+    @ApiResponse(responseCode ="200", description = "User found user by fullName")
+    public Flux<UserResponse> findAllByFullName(@RequestParam("full_name") String fullName,
+                                                              @RequestParam("page") @DefaultValue("0") int page,
+                                                              @RequestParam("size") @DefaultValue("20")  int size){
+        return userRestMapper.toUsersResponse(userInputPort.findUserByFullName(fullName,page,size));
     }
 }

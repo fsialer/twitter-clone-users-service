@@ -15,5 +15,6 @@ public interface UserInputPort {
     Mono<User> findByUserId(String userId);
     Mono<User> updateByUserId(String userId,User user);
     Flux<User> findUserFollowed(String userId);
+    Flux<User> findUserByFullName(String fullName, int page, int size);
 }
    

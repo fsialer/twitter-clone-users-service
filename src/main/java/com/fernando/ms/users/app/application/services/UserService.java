@@ -33,6 +33,7 @@ public class UserService implements UserInputPort {
                                         if (Boolean.TRUE.equals(existByEmail)) {
                                             return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
                                         }
+                                        user.setFullName(user.getNames().concat(" ").concat(user.getLastNames()));
                                         return userPersistencePort.save(user);
                                     }
                             );
@@ -108,5 +109,10 @@ public class UserService implements UserInputPort {
     public Flux<User> findUserFollowed(String userId) {
         return followPersistencePort.findFollowedByFollowerId(userId)
                 .flatMap(follow -> userPersistencePort.findByUserId(follow.getFollowedId()));
+    }
+
+    @Override
+    public Flux<User> findUserByFullName(String fullName, int page, int size) {
+        return userPersistencePort.findUserByFullName(fullName,page,size);
     }
 }
