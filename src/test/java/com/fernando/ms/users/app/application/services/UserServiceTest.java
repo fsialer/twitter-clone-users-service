@@ -1,8 +1,11 @@
 package com.fernando.ms.users.app.application.services;
 
+import com.fernando.ms.users.app.application.ports.output.FollowPersistencePort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
 import com.fernando.ms.users.app.domain.exceptions.*;
+import com.fernando.ms.users.app.domain.models.Follow;
 import com.fernando.ms.users.app.domain.models.User;
+import com.fernando.ms.users.app.utils.TestUtilFollow;
 import com.fernando.ms.users.app.utils.TestUtilUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
@@ -29,6 +33,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private FollowPersistencePort followPersistencePort;
 
     @Test
     @DisplayName("When Users Information Is Correct Expect A List Users")
@@ -362,5 +369,39 @@ class UserServiceTest {
         Mockito.verify(userPersistencePort, times(1)).findByUserId(anyString());
         Mockito.verify(userPersistencePort, times(1)).existsByEmail(anyString());
         Mockito.verify(userPersistencePort, Mockito.never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("When UserId Is Valid Expect List Of FollowedUsers")
+    void When_UserIdIsValid_Expect_ListOfFollowedUsers() {
+        String userId = "user123";
+        Follow follow = TestUtilFollow.buildFollowMock();
+        User followedUser = TestUtilUser.buildUserMock();
+        followedUser.setId("followedUser456");
+
+        when(followPersistencePort.findFollowedByFollowerId(anyString())).thenReturn(Flux.just(follow));
+        when(userPersistencePort.findByUserId(anyString())).thenReturn(Mono.just(followedUser));
+
+        Flux<User> result = userService.findUserFollowed(userId);
+
+        StepVerifier.create(result)
+                .expectNext(followedUser)
+                .verifyComplete();
+
+        verify(followPersistencePort, times(1)).findFollowedByFollowerId(anyString());
+        verify(userPersistencePort, times(1)).findByUserId(anyString());
+    }
+
+    @Test
+    @DisplayName("When fullName exists Expect A List Users that match")
+    void When_FullNameExists_Expect_AListUsersThatMatch() {
+        User user= TestUtilUser.buildUserMock();
+        when(userPersistencePort.findUserByFullName(anyString(),anyInt(),anyInt())).thenReturn(Flux.just(user));
+        Flux<User> users = userService.findUserByFullName("Fernando Sialer Ayala",1,20);
+        StepVerifier.create(users)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userPersistencePort, times(1)).findUserByFullName(anyString(),anyInt(),anyInt());
     }
 }

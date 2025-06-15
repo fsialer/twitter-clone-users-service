@@ -6,6 +6,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.mappe
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.repository.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -31,5 +32,10 @@ public class FollowPersistenceAdapter implements FollowPersistencePort {
     @Override
     public Mono<Void> delete(String id) {
         return followRepository.deleteById(id);
+    }
+
+    @Override
+    public Flux<Follow> findFollowedByFollowerId(String followerId) {
+        return followPersistenceMapper.toFluxFollow(followRepository.findAllByFollowerId(followerId));
     }
 }

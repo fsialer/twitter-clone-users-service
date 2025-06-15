@@ -165,4 +165,23 @@ class UserPersistenceAdapterTest {
         Mockito.verify(userReactiveRepository, times(1)).findByUserId(anyString());
         Mockito.verify(userPersistenceMapper, times(1)).toUser(any(UserEntity.class));
     }
+
+    @Test
+    @DisplayName("When FullName Exists Is Correct Expect A List Users")
+    void When_FullNameExistsIsCorrect_Expect_AListUsers() {
+        UserEntity userEntity = TestUtilUser.buildUserEntityMock();
+        User user = TestUtilUser.buildUserMock();
+
+        when(userReactiveRepository.findAllByFullNamePagination(anyString(), anyInt(), anyInt())).thenReturn(Flux.just(userEntity));
+        when(userPersistenceMapper.toUsers(any(Flux.class))).thenReturn(Flux.just(user));
+
+        Flux<User> users = userPersistenceAdapter.findUserByFullName("Fe", 1, 20);
+
+        StepVerifier.create(users)
+                .expectNext(user)
+                .verifyComplete();
+
+        Mockito.verify(userReactiveRepository, times(1)).findAllByFullNamePagination(anyString(), anyInt(), anyInt());
+        Mockito.verify(userPersistenceMapper, times(1)).toUsers(any(Flux.class));
+    }
 }

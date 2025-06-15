@@ -3,6 +3,7 @@ package com.fernando.ms.users.app.infraestructure.adapter.output.messaging;
 import com.azure.core.util.BinaryData;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverAsyncClient;
+
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.output.messaging.MessagingUserConsumerAdapter;
 import com.fernando.ms.users.app.utils.TestUtilUser;
@@ -89,5 +90,4 @@ class MessagingUserConsumerAdapterTest {
         verify(serviceBusReceiverAsyncClient, times(1)).receiveMessages();
         verify(serviceBusReceivedMessage, times(2)).getBody();
     }
-
 }

@@ -34,6 +34,7 @@ class UserPersistenceMapperTest {
                     assertEquals("cde8c071a420424abf28b189ae2cd6982", user.getId());
                     assertEquals("Fernando", user.getNames());
                     assertEquals("Sialer Ayala", user.getLastNames());
+                    assertEquals("Fernando Sialer Ayala",user.getFullName());
                     assertEquals("asialer05@hotmail.com", user.getEmail());
                     assertEquals("4f57f5d4f668d4ff5", user.getUserId());
                 })
@@ -51,6 +52,7 @@ class UserPersistenceMapperTest {
                             assertEquals("cde8c071a420424abf28b189ae2cd6982", user.getId());
                             assertEquals("Fernando", user.getNames());
                             assertEquals("Sialer Ayala", user.getLastNames());
+                            assertEquals("Fernando Sialer Ayala",user.getFullName());
                             assertEquals("asialer05@hotmail.com", user.getEmail());
                             assertEquals("4f57f5d4f668d4ff5", user.getUserId());
                         })
@@ -65,6 +67,7 @@ class UserPersistenceMapperTest {
         assertEquals("cde8c071a420424abf28b189ae2cd6982", user.getId());
         assertEquals("Fernando", user.getNames());
         assertEquals("Sialer Ayala", user.getLastNames());
+        assertEquals("Fernando Sialer Ayala",user.getFullName());
         assertEquals("asialer05@hotmail.com", user.getEmail());
         assertEquals("4f57f5d4f668d4ff5", user.getUserId());
     }
@@ -77,6 +80,7 @@ class UserPersistenceMapperTest {
         assertEquals("cde8c071a420424abf28b189ae2cd6982", userEntity.getId());
         assertEquals("Fernando", userEntity.getNames());
         assertEquals("Sialer Ayala", userEntity.getLastNames());
+        assertEquals("Fernando Sialer Ayala",user.getFullName());
         assertEquals("asialer05@hotmail.com", userEntity.getEmail());
         assertEquals("4f57f5d4f668d4ff5", userEntity.getUserId());
     }

@@ -1,6 +1,7 @@
 package com.fernando.ms.users.app.application.services;
 
 import com.fernando.ms.users.app.application.ports.input.UserInputPort;
+import com.fernando.ms.users.app.application.ports.output.FollowPersistencePort;
 import com.fernando.ms.users.app.application.ports.output.UserPersistencePort;
 import com.fernando.ms.users.app.domain.exceptions.*;
 import com.fernando.ms.users.app.domain.models.User;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserService implements UserInputPort {
     private final UserPersistencePort userPersistencePort;
+    private final FollowPersistencePort followPersistencePort;
 
     @Override
     public Flux<User> findAll() {
@@ -31,6 +33,7 @@ public class UserService implements UserInputPort {
                                         if (Boolean.TRUE.equals(existByEmail)) {
                                             return Mono.error(new UserEmailAlreadyExistsException(user.getEmail()));
                                         }
+                                        user.setFullName(user.getNames().concat(" ").concat(user.getLastNames()));
                                         return userPersistencePort.save(user);
                                     }
                             );
@@ -100,5 +103,16 @@ public class UserService implements UserInputPort {
                             )
                             .switchIfEmpty(Mono.defer(()->userPersistencePort.save(userInfo)));
                 });
+    }
+
+    @Override
+    public Flux<User> findUserFollowed(String userId) {
+        return followPersistencePort.findFollowedByFollowerId(userId)
+                .flatMap(follow -> userPersistencePort.findByUserId(follow.getFollowedId()));
+    }
+
+    @Override
+    public Flux<User> findUserByFullName(String fullName, int page, int size) {
+        return userPersistencePort.findUserByFullName(fullName,page,size);
     }
 }

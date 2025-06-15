@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,5 +37,20 @@ class FollowPersistenceMapperTest {
         FollowDocument followDocument=followPersistenceMapper.toFollowDocument(follow);
         assertEquals("68045526dffe6e2de223e55b", followDocument.getFollowerId());
         assertEquals("fdsfds4544", followDocument.getFollowedId());
+    }
+
+    @Test
+    @DisplayName("When Map FluxFollowDocument Expect FluxFollow")
+    void When_MapFluxFollowDocument_Expect_FluxFollow(){
+        FollowDocument followDocument= TestUtilFollow.buildFollowDocumentMock();
+        Flux<Follow> fluxFollow=followPersistenceMapper.toFluxFollow(Flux.just(followDocument));
+
+        StepVerifier.create(fluxFollow)
+                        .consumeNextWith(follow -> {
+                            assertEquals("68045526dffe6e2de223e55b", follow.getFollowerId());
+                            assertEquals("fdsfds4544", follow.getFollowedId());
+                        })
+                 .verifyComplete();
+
     }
 }

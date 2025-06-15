@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -105,6 +106,27 @@ class FollowPersistenceAdapterTest {
         StepVerifier.create(result)
                 .verifyComplete();
         verify(followRepository, times(1)).deleteById("followId");
+    }
+
+    @Test
+    @DisplayName("When FollowerId Is Valid Expect List Of Followers")
+    void When_FollowerIdIsValid_Expect_ListOfFollowers() {
+
+        String followerId = "follower123";
+        FollowDocument followDocument = TestUtilFollow.buildFollowDocumentMock();
+        Follow follow = TestUtilFollow.buildFollowMock();
+
+        when(followRepository.findAllByFollowerId(anyString())).thenReturn(Flux.just(followDocument));
+        when(followPersistenceMapper.toFluxFollow(any(Flux.class))).thenReturn(Flux.just(follow));
+
+        Flux<Follow> result = followPersistenceAdapter.findFollowedByFollowerId(followerId);
+
+        StepVerifier.create(result)
+                .expectNext(follow)
+                .verifyComplete();
+
+        verify(followRepository, times(1)).findAllByFollowerId(followerId);
+        verify(followPersistenceMapper, times(1)).toFluxFollow(any(Flux.class));
     }
 
 }

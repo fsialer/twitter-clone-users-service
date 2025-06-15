@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -112,7 +113,7 @@ public class UserRestAdapter{
     @GetMapping("/me")
     @Operation(summary = "Find user authenticated")
     @ApiResponse(responseCode ="200", description = "Found user authenticated")
-    public Mono<ResponseEntity<UserResponse>> findByUserId(@RequestHeader("X-User-Id") String userId){
+    public Mono<ResponseEntity<UserResponse>> me(@RequestHeader("X-User-Id") String userId){
         return userInputPort.findByUserId(userId)
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
     }
@@ -124,5 +125,29 @@ public class UserRestAdapter{
                                                                  @Valid @RequestBody UpdateUserRequest rq){
         return userInputPort.updateByUserId(userId,userRestMapper.toUser(rq))
                 .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
+    }
+
+    @GetMapping("/{userId}/followed")
+    @Operation(summary = "Find all Followed by user authenticated")
+    @ApiResponse(responseCode = "200", description = "List user followed")
+    public Flux<UserResponse> findAllFollowedByUserId(@PathVariable String userId){
+        return userRestMapper.toUsersResponse(userInputPort.findUserFollowed(userId));
+    }
+
+    @GetMapping("/{userId}/user-id")
+    @Operation(summary = "Find user by userId")
+    @ApiResponse(responseCode ="200", description = "Found user by userId")
+    public Mono<ResponseEntity<UserResponse>> findByUserId(@PathVariable String userId){
+        return userInputPort.findByUserId(userId)
+                .flatMap(user-> Mono.just(ResponseEntity.ok(userRestMapper.toUserResponse(user))));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Find user by fullname")
+    @ApiResponse(responseCode ="200", description = "User found user by fullName")
+    public Flux<UserResponse> findAllByFullName(@RequestParam("full_name") String fullName,
+                                                              @RequestParam("page") @DefaultValue("0") int page,
+                                                              @RequestParam("size") @DefaultValue("20")  int size){
+        return userRestMapper.toUsersResponse(userInputPort.findUserByFullName(fullName,page,size));
     }
 }

@@ -14,6 +14,7 @@ public class User {
     private String id;
     private String names;
     private String lastNames;
+    private String fullName;
     private String email;
     private String userId;
     private LocalDate birth;
