@@ -18,4 +18,5 @@ public class UserResponse {
     private String email;
     private String sex;
     private LocalDate birth;
+    private String userId;
 }
