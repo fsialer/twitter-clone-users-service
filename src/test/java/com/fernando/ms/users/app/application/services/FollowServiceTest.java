@@ -181,4 +181,34 @@ class FollowServiceTest {
         verify(followPersistencePort, times(1)).findByIdAndFollowerId(anyString(), anyString());
         verify(followPersistencePort, never()).delete(anyString());
     }
+
+    @Test
+    @DisplayName("When User Followed Exists Expect True")
+    void When_UserFollowedExists_Expect_True() {
+
+        when(followPersistencePort.verifyFollow(anyString(),anyString())).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = followService.verifyFollow("cde8c071a420424abf28b189ae2cd698","fdfdsf54dsf51ds5f");
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+
+        Mockito.verify(followPersistencePort, times(1)).verifyFollow(anyString(),anyString());
+    }
+
+    @Test
+    @DisplayName("When User Followed Exists Expect False")
+    void When_UserFollowedExists_Expect_False() {
+
+        when(followPersistencePort.verifyFollow(anyString(),anyString())).thenReturn(Mono.just(false));
+
+        Mono<Boolean> result = followService.verifyFollow("cde8c071a420424abf28b189ae2cd698","fdfdsf54dsf51ds5f");
+
+        StepVerifier.create(result)
+                .expectNext(false)
+                .verifyComplete();
+
+        Mockito.verify(followPersistencePort, times(1)).verifyFollow(anyString(),anyString());
+    }
 }

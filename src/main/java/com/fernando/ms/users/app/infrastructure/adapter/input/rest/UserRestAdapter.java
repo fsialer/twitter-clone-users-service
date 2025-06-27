@@ -8,6 +8,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRe
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -146,8 +147,15 @@ public class UserRestAdapter{
     @Operation(summary = "Find user by fullname")
     @ApiResponse(responseCode ="200", description = "User found user by fullName")
     public Flux<UserResponse> findAllByFullName(@RequestParam("full_name") String fullName,
-                                                              @RequestParam("page") @DefaultValue("0") int page,
+                                                              @RequestParam("page") @DefaultValue("1") int page,
                                                               @RequestParam("size") @DefaultValue("20")  int size){
         return userRestMapper.toUsersResponse(userInputPort.findUserByFullName(fullName,page,size));
+    }
+
+    @GetMapping("/follow/{userId}/verify")
+    @Operation(summary = "Verify if user authenticated followed to other user")
+    @ApiResponse(responseCode =  "200", description = "Return a boolean if user authenticated following to other user")
+    public Mono<ExistsUserFollowedResponse> verifyUserFollowed(@RequestHeader("X-User-Id") String userId, @PathVariable("userId") String followedId){
+        return followInputPort.verifyFollow(userId,followedId).map(followRestMapper::toExistsUserFollowed);
     }
 }
