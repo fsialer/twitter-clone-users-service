@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 public interface FollowInputPort {
     Mono<Void> followUser(Follow follow);
     Mono<Void> unFollowUser(String id,String followerId);
+    Mono<Boolean> verifyFollow(String userId, String followedId);
 }

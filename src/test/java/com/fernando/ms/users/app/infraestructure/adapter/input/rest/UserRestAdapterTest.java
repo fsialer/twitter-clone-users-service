@@ -343,4 +343,22 @@ class UserRestAdapterTest {
         Mockito.verify(userInputPort,times(1)).findUserByFullName(anyString(),anyInt(),anyInt());
         Mockito.verify(userRestMapper,times(1)).toUsersResponse(any(Flux.class));
     }
+
+    @Test
+    @DisplayName("When User Authenticated Have An User Followed Expect Existence True")
+    void When_UserAuthenticatedHaveAnUserFollowed_Expect_ExistenceTrue() {
+        when(followInputPort.verifyFollow(anyString(),anyString())).thenReturn(Mono.just(true));
+        when(followRestMapper.toExistsUserFollowed(anyBoolean())).thenReturn(TestUtilUser.buildExistsUserFollowedResponseMock());
+
+        webTestClient.get()
+                .uri("/v1/users/follow/{userId}/verify", 1L)
+                .header("X-User-Id", "4f57f5d4f668d4ff5")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.exists").isEqualTo(true);
+
+        Mockito.verify(followInputPort, times(1)).verifyFollow(anyString(),anyString());
+        Mockito.verify(followRestMapper, times(1)).toExistsUserFollowed(anyBoolean());
+    }
 }

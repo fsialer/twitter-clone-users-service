@@ -2,6 +2,7 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper;
 
 import com.fernando.ms.users.app.domain.models.Follow;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,6 +12,12 @@ public interface FollowRestMapper {
         return Follow.builder()
                 .followerId(userId)
                 .followedId(rq.getFollowedId())
+                .build();
+    }
+
+    default ExistsUserFollowedResponse toExistsUserFollowed(Boolean exists){
+        return ExistsUserFollowedResponse.builder()
+                .exists(exists)
                 .build();
     }
 }
