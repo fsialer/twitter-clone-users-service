@@ -11,4 +11,5 @@ public interface FollowPersistencePort {
     Mono<Void> delete(String id);
     Flux<Follow> findFollowedByFollowerId(String followerId);
     Mono<Long> countFollowers(String userId);
+    Mono<Long> countFollowed(String userId);
 }

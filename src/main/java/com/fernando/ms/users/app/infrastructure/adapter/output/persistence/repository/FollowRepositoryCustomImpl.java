@@ -17,4 +17,10 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
         Query query=new Query(Criteria.where("followedId").is(followedId));
         return reactiveMongoTemplate.count(query, Long.class);
     }
+
+    @Override
+    public Mono<Long> countFollowedByFollowerId(String followerId) {
+        Query query=new Query(Criteria.where("followerId").is(followerId));
+        return reactiveMongoTemplate.count(query, Long.class);
+    }
 }

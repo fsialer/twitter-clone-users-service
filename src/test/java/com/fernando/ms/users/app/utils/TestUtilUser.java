@@ -3,10 +3,7 @@ package com.fernando.ms.users.app.utils;
 import com.fernando.ms.users.app.domain.models.User;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.*;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 
 import java.time.LocalDate;
@@ -88,6 +85,12 @@ public class TestUtilUser {
 
     public static QuantityFollowersResponse buildQuantityFollowersResponseMock(){
         return  QuantityFollowersResponse.builder()
+                .quantity(1L)
+                .build();
+    }
+
+    public static QuantityFollowedResponse buildQuantityFollowedResponseMock(){
+        return  QuantityFollowedResponse.builder()
                 .quantity(1L)
                 .build();
     }

@@ -363,7 +363,7 @@ class UserRestAdapterTest {
     }
 
     @Test
-    @DisplayName("When User Authenticated Have An User Followed Expect Existence True")
+    @DisplayName("When User Authenticated Is Valid Expect Quantity Followers")
     void When_UserAuthenticatedIsValid_Expect_QuantityFollowers() {
         when(followInputPort.countFollowers(anyString())).thenReturn(Mono.just(1L));
         when(followRestMapper.toQuantityFollowersResponse(anyLong())).thenReturn(TestUtilUser.buildQuantityFollowersResponseMock());
@@ -378,5 +378,23 @@ class UserRestAdapterTest {
 
         Mockito.verify(followInputPort, times(1)).countFollowers(anyString());
         Mockito.verify(followRestMapper, times(1)).toQuantityFollowersResponse(anyLong());
+    }
+
+    @Test
+    @DisplayName("When User Authenticated Exist Expect Quantity Followed")
+    void When_UserAuthenticatedIsValid_Expect_QuantityFollowed() {
+        when(followInputPort.countFollowed(anyString())).thenReturn(Mono.just(1L));
+        when(followRestMapper.toQuantityFollowedResponse(anyLong())).thenReturn(TestUtilUser.buildQuantityFollowedResponseMock());
+
+        webTestClient.get()
+                .uri("/v1/users/follow/followed")
+                .header("X-User-Id", "4f57f5d4f668d4ff5")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.quantity").isEqualTo(1L);
+
+        Mockito.verify(followInputPort, times(1)).countFollowed(anyString());
+        Mockito.verify(followRestMapper, times(1)).toQuantityFollowedResponse(anyLong());
     }
 }

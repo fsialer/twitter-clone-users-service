@@ -43,4 +43,9 @@ public class FollowPersistenceAdapter implements FollowPersistencePort {
     public Mono<Long> countFollowers(String userId) {
         return followRepository.countFollowersByFollowedId(userId);
     }
+
+    @Override
+    public Mono<Long> countFollowed(String userId) {
+        return followRepository.countFollowedByFollowerId(userId);
+    }
 }
