@@ -133,17 +133,34 @@ class FollowPersistenceAdapterTest {
     @DisplayName("When FollowedId Is Valid Expect Quantity Followers")
     void When_FollowedIdIsValid_Expect_QuantityFollowers() {
 
-        String followerId = "follower123";
+        String followedId = "follower123";
 
         when(followRepository.countFollowersByFollowedId(anyString())).thenReturn(Mono.just(1L));
 
-        Mono<Long> result = followPersistenceAdapter.countFollowers(followerId);
+        Mono<Long> result = followPersistenceAdapter.countFollowers(followedId);
 
         StepVerifier.create(result)
                 .expectNext(1L)
                 .verifyComplete();
 
         verify(followRepository, times(1)).countFollowersByFollowedId(anyString());
+    }
+
+    @Test
+    @DisplayName("When FollowerId Is Valid Expect Quantity Followed")
+    void When_FollowerIdIsValid_Expect_QuantityFollowed() {
+
+        String followerId = "follower123";
+
+        when(followRepository.countFollowedByFollowerId(anyString())).thenReturn(Mono.just(1L));
+
+        Mono<Long> result = followPersistenceAdapter.countFollowed(followerId);
+
+        StepVerifier.create(result)
+                .expectNext(1L)
+                .verifyComplete();
+
+        verify(followRepository, times(1)).countFollowedByFollowerId(anyString());
     }
 
 }

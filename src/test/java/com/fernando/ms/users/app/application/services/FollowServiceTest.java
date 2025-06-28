@@ -226,4 +226,19 @@ class FollowServiceTest {
 
         Mockito.verify(followPersistencePort, times(1)).countFollowers(anyString());
     }
+
+    @Test
+    @DisplayName("When UserId Is Valid Expect Quantity Followed")
+    void When_UserIdIsValid_Expect_QuantityFollowed() {
+
+        when(followPersistencePort.countFollowed(anyString())).thenReturn(Mono.just(1L));
+
+        Mono<Long> result = followService.countFollowed("cde8c071a420424abf28b189ae2cd698");
+
+        StepVerifier.create(result)
+                .expectNext(1L)
+                .verifyComplete();
+
+        Mockito.verify(followPersistencePort, times(1)).countFollowed(anyString());
+    }
 }

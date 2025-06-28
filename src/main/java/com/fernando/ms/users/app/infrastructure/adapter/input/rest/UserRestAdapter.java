@@ -8,10 +8,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.UserRe
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -165,5 +162,12 @@ public class UserRestAdapter{
     @ApiResponse(responseCode = "200", description = "Quantity followers")
     public Mono<QuantityFollowersResponse> countFollowersUser(@RequestHeader("X-User-Id") String userId){
         return followInputPort.countFollowers(userId).map(followRestMapper::toQuantityFollowersResponse);
+    }
+
+    @GetMapping("/follow/followed")
+    @Operation(summary = "Count followers of user authenticated")
+    @ApiResponse(responseCode = "200", description = "Quantity followed")
+    public Mono<QuantityFollowedResponse> countFollowedUser(@RequestHeader("X-User-Id") String userId){
+        return followInputPort.countFollowed(userId).map(followRestMapper::toQuantityFollowedResponse);
     }
 }

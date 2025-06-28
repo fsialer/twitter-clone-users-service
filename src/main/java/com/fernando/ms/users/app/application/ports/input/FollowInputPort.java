@@ -8,4 +8,5 @@ public interface FollowInputPort {
     Mono<Void> unFollowUser(String id,String followerId);
     Mono<Boolean> verifyFollow(String userId, String followedId);
     Mono<Long> countFollowers(String userId);
+    Mono<Long> countFollowed(String userId);
 }
