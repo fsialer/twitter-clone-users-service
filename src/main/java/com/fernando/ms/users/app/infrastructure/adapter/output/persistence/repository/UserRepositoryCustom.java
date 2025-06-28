@@ -5,4 +5,5 @@ import reactor.core.publisher.Flux;
 
 public interface UserRepositoryCustom {
     Flux<UserEntity> findAllByFullNamePagination(String postId, int page, int size);
+
 }
