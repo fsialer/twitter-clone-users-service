@@ -19,4 +19,5 @@ public class User {
     private String userId;
     private LocalDate birth;
     private String sex;
+    private LocalDate createdAt;
 }
