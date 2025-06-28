@@ -19,4 +19,5 @@ public class UserResponse {
     private String sex;
     private LocalDate birth;
     private String userId;
+    private LocalDate createdAt;
 }
