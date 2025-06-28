@@ -4,7 +4,7 @@ import com.fernando.ms.users.app.domain.models.Follow;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper.FollowRestMapper;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
-import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
 import com.fernando.ms.users.app.utils.TestUtilFollow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +37,13 @@ class FollowRestMapperTest {
     void When_MapBoolean_Expect_ExistsUserFollowedResponse(){
         ExistsUserFollowedResponse existsUserFollowedResponse=followRestMapper.toExistsUserFollowed(Boolean.TRUE);
         assertTrue(existsUserFollowedResponse.exists());
+    }
+
+    @Test
+    @DisplayName("When Map Quantity Expect Quantity Followers Response")
+    void When_MapQuantity_Expect_QuantityFollowersResponse(){
+        QuantityFollowersResponse quantityFollowersResponse=followRestMapper.toQuantityFollowersResponse(1L);
+        assertEquals(1L,quantityFollowersResponse.quantity());
     }
 
 }

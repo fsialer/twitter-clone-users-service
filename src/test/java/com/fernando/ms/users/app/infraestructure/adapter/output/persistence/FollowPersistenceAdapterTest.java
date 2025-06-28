@@ -129,4 +129,21 @@ class FollowPersistenceAdapterTest {
         verify(followPersistenceMapper, times(1)).toFluxFollow(any(Flux.class));
     }
 
+    @Test
+    @DisplayName("When FollowedId Is Valid Expect Quantity Followers")
+    void When_FollowedIdIsValid_Expect_QuantityFollowers() {
+
+        String followerId = "follower123";
+
+        when(followRepository.countFollowersByFollowedId(anyString())).thenReturn(Mono.just(1L));
+
+        Mono<Long> result = followPersistenceAdapter.countFollowers(followerId);
+
+        StepVerifier.create(result)
+                .expectNext(1L)
+                .verifyComplete();
+
+        verify(followRepository, times(1)).countFollowersByFollowedId(anyString());
+    }
+
 }

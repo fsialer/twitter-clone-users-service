@@ -47,5 +47,10 @@ public class FollowService implements FollowInputPort {
         return followPersistencePort.verifyFollow(userId,followedId);
     }
 
+    @Override
+    public Mono<Long> countFollowers(String userId) {
+        return followPersistencePort.countFollowers(userId);
+    }
+
 
 }

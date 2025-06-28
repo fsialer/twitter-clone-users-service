@@ -3,6 +3,7 @@ package com.fernando.ms.users.app.infrastructure.adapter.input.rest.mapper;
 import com.fernando.ms.users.app.domain.models.Follow;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.CreateFollowRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -18,6 +19,12 @@ public interface FollowRestMapper {
     default ExistsUserFollowedResponse toExistsUserFollowed(Boolean exists){
         return ExistsUserFollowedResponse.builder()
                 .exists(exists)
+                .build();
+    }
+
+    default QuantityFollowersResponse toQuantityFollowersResponse(Long quantity){
+        return QuantityFollowersResponse.builder()
+                .quantity(quantity)
                 .build();
     }
 }

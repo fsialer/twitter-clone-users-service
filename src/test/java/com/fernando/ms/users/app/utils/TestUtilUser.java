@@ -5,6 +5,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.UserEntity;
 
@@ -82,6 +83,12 @@ public class TestUtilUser {
     public static ExistsUserFollowedResponse buildExistsUserFollowedResponseMock(){
         return  ExistsUserFollowedResponse.builder()
                 .exists(true)
+                .build();
+    }
+
+    public static QuantityFollowersResponse buildQuantityFollowersResponseMock(){
+        return  QuantityFollowersResponse.builder()
+                .quantity(1L)
                 .build();
     }
 }

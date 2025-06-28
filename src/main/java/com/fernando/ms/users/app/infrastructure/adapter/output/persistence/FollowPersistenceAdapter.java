@@ -38,4 +38,9 @@ public class FollowPersistenceAdapter implements FollowPersistencePort {
     public Flux<Follow> findFollowedByFollowerId(String followerId) {
         return followPersistenceMapper.toFluxFollow(followRepository.findAllByFollowerId(followerId));
     }
+
+    @Override
+    public Mono<Long> countFollowers(String userId) {
+        return followRepository.countFollowersByFollowedId(userId);
+    }
 }

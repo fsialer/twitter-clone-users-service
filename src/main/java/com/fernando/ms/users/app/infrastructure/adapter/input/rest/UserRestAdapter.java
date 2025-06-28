@@ -10,6 +10,7 @@ import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.reques
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.request.UpdateUserRequest;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserFollowedResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.ExistsUserResponse;
+import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.QuantityFollowersResponse;
 import com.fernando.ms.users.app.infrastructure.adapter.input.rest.models.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -157,5 +158,12 @@ public class UserRestAdapter{
     @ApiResponse(responseCode =  "200", description = "Return a boolean if user authenticated following to other user")
     public Mono<ExistsUserFollowedResponse> verifyUserFollowed(@RequestHeader("X-User-Id") String userId, @PathVariable("userId") String followedId){
         return followInputPort.verifyFollow(userId,followedId).map(followRestMapper::toExistsUserFollowed);
+    }
+
+    @GetMapping("/follow/followers")
+    @Operation(summary = "Count followers of user authenticated")
+    @ApiResponse(responseCode = "200", description = "Quantity followers")
+    public Mono<QuantityFollowersResponse> countFollowersUser(@RequestHeader("X-User-Id") String userId){
+        return followInputPort.countFollowers(userId).map(followRestMapper::toQuantityFollowersResponse);
     }
 }
