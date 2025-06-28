@@ -1,5 +1,6 @@
 package com.fernando.ms.users.app.infrastructure.adapter.output.persistence.repository;
 
+import com.fernando.ms.users.app.infrastructure.adapter.output.persistence.models.FollowDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,12 +16,12 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     @Override
     public Mono<Long> countFollowersByFollowedId(String followedId) {
         Query query=new Query(Criteria.where("followedId").is(followedId));
-        return reactiveMongoTemplate.count(query, Long.class);
+        return reactiveMongoTemplate.count(query, FollowDocument.class);
     }
 
     @Override
     public Mono<Long> countFollowedByFollowerId(String followerId) {
         Query query=new Query(Criteria.where("followerId").is(followerId));
-        return reactiveMongoTemplate.count(query, Long.class);
+        return reactiveMongoTemplate.count(query, FollowDocument.class);
     }
 }
